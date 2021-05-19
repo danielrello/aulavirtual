@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+{% import "bootstrap/wtf.html" as wtf %}
+
+{% block content %}
+<div class="new-post">
+    <button><a href={{url_for('module002.module002_new_post', forum_id=forum.id)}}>New Post</a></button>
+</div>
+<div class="forum">
+    <div class="forum-thumbnail">
+        <a href="url_for('.user', username=forum.author.username)">
+            <img class="img-rounded profile-thumbnail" src="">
+        </a>
+    </div>
+    <div class="forum-content">
+        <div class="forum-title"><a href="{{ url_for('module002.module002_forum_posts', id=forum.id) }}">
+            {{ forum.title }}</a>
+        </div>
+        <div class="forum-date">{{ forum.timeago }}</div>
+        <div class="forum-author">
+            <a href="url_for('.user', username=forum.author.username)">Created by {{ forum.author.username }}</a>
+        </div>
+        <div class="forum-course">
+            {% if forum.course %}
+                {{ forum.course.name }}
+            {% else %}
+                {{ "This forum has no course related to it" }}
+            {% endif %}
+        </div>
+    </div>
+    {% include 'module002_posts.html' %}
+</div>
+{% endblock %}

@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+{% import "bootstrap/wtf.html" as wtf %}
+
+{% block content %}
+<div class="page-header">
+    <h1>Hello, {% if current_user.is_authenticated %}{{ current_user.username }}{% else %}Stranger{% endif %}!</h1>
+    <h2>You are logged as {{ current_user.profile }}</h2>
+</div>
+<div class="new-forum">
+    <button><a href={{url_for('module002.module002_new_forum')}}>New Forum</a></button>
+</div>
+{% include 'module002_forums.html' %}
+<div class="post-tabs">
+    <ul class="nav nav-tabs">
+        Post Navs
+    </ul>
+</div>
+{% endblock %}

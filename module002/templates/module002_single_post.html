@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+{% import "bootstrap/wtf.html" as wtf %}
+
+{% block content %}
+<div class="new-comment">
+    <div class="new-comment-form">
+        <div class="comment-form">
+            <form class="row g-3 align-items-baseline" method="post" action="{{ url_for('module002.module002_new_comment', id=post.id) }}">
+            {{ form.hidden_tag() }}
+            <div class="input-group mb-3">
+                <div class="form-control">{{ wtf.form_field(form.body) }}</div>
+              <span class="input-group-text">{{ wtf.form_field(form.submit_button) }}</span>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="post">
+    <div class="post-content">
+        <div class="post-title"><a href="{{ url_for('module002.module002_post_comments', id=post.id) }}">
+            {{ post.title }}</a>
+        </div>
+        <div class="post-date">{{ post.timeago }}</div>
+        <div class="post-author"><a href="url_for('.user', username=post.author.username)">Posted by {{ post.author.username }}</a></div>
+    </div>
+    <div class="post-comments">
+        {% for comment in comments %}
+            <div class="border border-5 item-hover rounded border-light p-2  comment">
+                <div class="avatar-img"
+                    style="background-image:url({{ avatars.gravatar(comment.author.avatar_hash, size='46', default='retro') }})">
+                </div>
+                <div class="comment-body">
+                    <h5 class="my-1">{{ comment.author.username }} · {{ comment.timeago }}</h5>
+                    <p class="my-1">
+                    {% if comment.body_html %}
+                        {{ comment.body_html | safe }}
+                    {% else %}
+                        {{ comment.body }}
+                    {% endif %}
+                    </p>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+</div>
+    <script>
+    $(document).ready(function (){
+        $('.new-comment-form').hide();
+    })
+        function showComment() {
+            $('.new-comment-form').slideDown();
+        }
+    </script>
+{% endblock %}

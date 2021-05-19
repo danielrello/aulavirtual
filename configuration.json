@@ -1,0 +1,11 @@
+{
+    "mysql_password": "Patata1234",
+    "gmail_password": "gbprmaxqawxsnlga",
+    "gmail_username": "carthonuni@gmail.com",
+    "mysql_hostname": "danirello.mysql.pythonanywhere-services.com",
+    "mysql_username": "danirello",
+    "SECRET_KEY": "123456",
+    "MODE": "dev",
+    "FLASKY_POSTS_PER_PAGE": 10,
+    "mysql_databasename": "danirello$aulavirtual"
+}

@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+
+{% block content %} 
+	<h1> Activities </h1>
+    <p>Select an activity from the following courses</p>
+    <div class="courses">
+        {% for course in courses %}
+            <div class="course">
+            <div class="course-head">
+                <h2>{{ course.title }}</h2>
+                <h2>{{ course.code }}</h2>
+            </div>
+            <h3>Professor: {{ course.author }}</h3>
+            <div class="activities">
+            {% for activity in activities %}
+                <div class="activity">
+                    <h3>{{ activity.title }}</h3>
+                    <p>{{ activity.limit_date }}</p>
+                </div>
+            {% endfor %}
+            </div>
+            {% endfor %}
+            </div>
+    </div>
+{% endblock %} 
