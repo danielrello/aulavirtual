@@ -18,7 +18,13 @@
     <hr class="my-4">
     </div>
     <div class="activity-content">
-        Aqui va todo el tema de la respuesta
+        {% if current_user.profile in ('admin', 'staff', 'professor') %}
+        {{ form.activity_grade(class_="form-control") }}
+            {% if  %}
+        {% else %}
+        {{ form.body(class_="form-control") }}
+        {{ form.files(class_="form-control") }}
+        {% endif %}
     </div>
 </div>
 {% endblock %}

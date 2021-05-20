@@ -5,7 +5,7 @@ from flask import Blueprint, render_template, request, current_app, flash, redir
 from flask_login import current_user, login_required
 
 from models import User, Course, Activity, Follow, db
-from module003.forms import ActivityForm
+from module003.forms import ActivityForm, ActivityResultForm
 
 module003 = Blueprint("module003", __name__, static_folder="static", template_folder="templates")
 
@@ -45,12 +45,14 @@ def module003_index():
 @module003.route('/activity', methods=['GET'])
 @login_required
 def module003_single_activity():
+    form = ActivityResultForm()
     activity_id = request.args.get('id')
     query = Activity.query
     activity = query.get(activity_id)
     activity.timeago = timeago.format(activity.timestamp, datetime.datetime.now())
     activity.time_left = activity.limit_date.strftime("%Y-%m-%d %H:%M:%S")
-    return render_template('module003_single_activity.html', module="module003", activity=activity)
+    return render_template('module003_single_activity.html', form=form, module="module003", activity=activity)
+
 
 @module003.route('/new_activity', methods=['GET', 'POST'])
 @login_required

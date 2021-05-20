@@ -75,21 +75,18 @@ class Activity(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.Text)
     activity_uploads = db.Column(db.Text, default='Empty')
-    activity_grade = db.Column(db.Integer, default=0)
     body = db.Column(db.Text)
     body_html = db.Column(db.Text)
-    result_upload = db.Column(db.Text, default='Empty')
-    result_body = db.Column(db.Text)
-    result_body_html = db.Column(db.Text)
     timestamp = db.Column(db.DateTime, default=db.func.current_timestamp())
     limit_date = db.Column(db.DateTime, default=db.func.curret_timestamp())
     author_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     course_id = db.Column(db.Integer, db.ForeignKey('course.id'))
 
-class CompletedActivity(db.Model):
+class ActivityResult(db.Model):
+    __tablename__=' activityresult'
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
-    activity_id = db.Column(db.Integer, db.ForeignKey('course.id'), nullable=False)
+    user_id = db.relationship('User', backref='activityresult', lazy=True)
+    activity_id = db.relationship('Activity', backref='activityresult', lazy=True)
     activity_grade = db.Column(db.String(50))
     body_html = db.Column(db.Text)
     body = db.Column(db.Text)
