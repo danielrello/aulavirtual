@@ -86,6 +86,16 @@ class Activity(db.Model):
     author_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     course_id = db.Column(db.Integer, db.ForeignKey('course.id'))
 
+class CompletedActivity(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    activity_id = db.Column(db.Integer, db.ForeignKey('course.id'), nullable=False)
+    activity_grade = db.Column(db.String(50))
+    body_html = db.Column(db.Text)
+    body = db.Column(db.Text)
+    files = db.Column(db.Text)
+    date_created = db.Column(db.DateTime, default=db.func.current_timestamp())
+
 
 class Comment(db.Model):
     __tablename__ = 'comments'
