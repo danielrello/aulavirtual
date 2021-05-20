@@ -5,12 +5,6 @@
     text-align: center;
 }
 
-.posts, .forums{
-    display: flex;
-    justify-content: start;
-    flex-flow: wrap;
-}
-
 .forum:hover{
     outline: blue solid 1px ;
 }
