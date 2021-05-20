@@ -114,7 +114,7 @@ def module002_new_comment():
         else:
             flash("An error has occurred while sending your comment")
             flash("Post id:" + id + " " + form.body.data)
-    return redirect(url_for('module002.module002_index'))
+    return redirect(url_for('module002.module002_post_comments', id=id))
 
 @module002.route('/new_post', methods=['GET', 'POST'])
 @login_required

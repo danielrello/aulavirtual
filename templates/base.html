@@ -5,11 +5,12 @@
 {% block head %}
     {{ super() }}
     <title> U-TAD </title>
-      <meta charset="utf-8">
-      <meta name="viewport" content="width=device-width, initial-scale=1">
-      {% block styles %}
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    {% block styles %}
         {{super()}}
-          <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+            <link href="https://cdnjs.cloudflare.com/ajax/libs/jquery-datetimepicker/2.5.20/jquery.datetimepicker.css" rel="stylesheet"/>
+            <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
       {% endblock %}
   {% endblock %}
 {% block body %}
@@ -27,9 +28,6 @@
                   {% if current_user.profile in ('admin','staff','student') %}
                       <li class="nav-item"><a class="nav-link {% if module=='module001' %}{{ "active" }}{%else%}{%endif%}" href="/course">Course</a></li>
                       <li class="nav-item"><a class="nav-link {% if module=='module002' %}{{ "active" }}{%else%}{%endif%}" href="/board">Discussion Board</a></li>
-                  {% endif %}
-
-                  {% if current_user.profile in ('admin','staff','professor') %}
                       <li class="nav-item"><a class="nav-link {% if module=='module003' %}{{ "active" }}{%else%}{%endif%}" href="/assignment">Assignment</a></li>
                   {% endif %}
                   {% if current_user.profile in ('admin') %}
@@ -39,6 +37,7 @@
             {% else %}
                   <li class="nav-item"><a class="nav-link {% if module=='home' %}{{ "active" }}{%else%}{%endif%}" href="/">Home</a></li>
                   <li class="nav-item"><a class="nav-link {% if module=='login' %}{{ "active" }}{%else%}{%endif%}" href={{url_for('login')}}>Login</a></li>
+                  <li class="nav-item"><a class="nav-link {% if module=='signup' %}{{ "active" }}{%else%}{%endif%}" href={{url_for('signup')}}>Register</a></li>
             {% endif %}
 
                 <li class="nav-item nav-"> <a class="nav-link" href={{url_for('logout')}}>Logout</a></li>
@@ -62,6 +61,7 @@
 
 {% block scripts %}
     {{ super() }}
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-datetimepicker/2.5.20/jquery.datetimepicker.full.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
     <script type="text/javascript" src="https://cdn.datatables.net/1.10.24/js/jquery.dataTables.min.js"></script>
     <script type="text/javascript" src="https://cdn.datatables.net/buttons/1.7.0/js/dataTables.buttons.min.js"></script>
@@ -86,5 +86,6 @@
 		} );
     </script>
 {% endblock %}
+    {% block scripts_next %}{% endblock %}
 {% endblock %}
 {% endblock %}

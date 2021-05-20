@@ -58,9 +58,9 @@ admin = init_admin(app)
 from models import init_db, User
 db = init_db(app)
 
-migrate = Migrate(app,db)
+migrate = Migrate(app, db)
 manager = Manager(app)
-manager.add_command('db',MigrateCommand)
+manager.add_command('db', MigrateCommand)
 
 from flask_login import LoginManager
 login_manager = LoginManager() # Creando el objeto de la clase Login

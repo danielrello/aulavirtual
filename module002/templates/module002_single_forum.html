@@ -2,8 +2,8 @@
 {% import "bootstrap/wtf.html" as wtf %}
 
 {% block content %}
-<div class="new-post">
-    <button><a href={{url_for('module002.module002_new_post', forum_id=forum.id)}}>New Post</a></button>
+<div class="d-flex justify-content-center p-3">
+    <a class="btn btn-primary" href={{url_for('module002.module002_new_post', forum_id=forum.id)}}>New Post</a>
 </div>
 <div class="forum">
     <div class="forum-thumbnail">

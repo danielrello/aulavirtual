@@ -1,8 +1,9 @@
-<ul class="posts">
+<ul class="list-group">
     {% for post in posts %}
-        <div class="card text-center">
-          <div class="card-header">
-            <div class="post-author"><a href="url_for('.user', username=post.author.username)">{{ post.author.username }}</a></div>
+    <li class="list-group-item list-group-item-action list-group-item-secondary flex-column align-items-start">
+          <div class="d-flex w-100 justify-content-between">
+            <h5 class="mb-1"><a href="url_for('.user', username=post.author.username)">{{ post.author.username }}</a></h5>
+            <small>{{ post.timeago }}</small>
           </div>
           <div class="card-body">
             <h5 class="card-title">
@@ -29,53 +30,11 @@
             <a href="url_for('.post', id=post.id)">
                 <span class="label label-default">Permalink</span>
             </a>
-            <a href="url_for('.post', id=post.id) #comments">
+            <a href="{{ url_for('module002.module002_post_comments', id=post.id) }}">
                 <span class="label label-primary">{{ post.comments.count() }} Comments</span>
             </a>
           </div>
-          <div class="card-footer text-muted">
-            <div class="post-date">{{ post.timeago }}</div>
-          </div>
-        </div>
-    <li class="post">
-        <div class="post-thumbnail">
-            <a href="url_for('.user', username=post.author.username)">
-                <img class="img-rounded profile-thumbnail" src="">
-            </a>
-        </div>
-        <div class="post-content">
-            <div class="post-header">
-                <div class="post-title">
-                    <a href={{ url_for('module002.module002_post_comments', id=post.id) }}>{{ post.title }}</a>
-                </div>
-                <div class="post-date">{{ post.timeago }}</div>
-            </div>
-            <div class="post-author"><a href="url_for('.user', username=post.author.username)">{{ post.author.username }}</a></div>
-            <div class="post-body">
-                {% if post.body_html %}
-                    {{ post.body_html | safe }}
-                {% else %}
-                    {{ post.body }}
-                {% endif %}
-            </div>
-            <div class="post-footer">
-                {% if current_user == post.author %}
-                <a href="url_for('.edit', id=post.id)">
-                    <span class="label label-primary">Edit</span>
-                </a>
-                {% elif current_user.profile == 'teacher' %}
-                <a href="url_for('.edit', id=post.id)">
-                    <span class="label label-danger">Edit [Admin]</span>
-                </a>
-                {% endif %}
-                <a href="url_for('.post', id=post.id)">
-                    <span class="label label-default">Permalink</span>
-                </a>
-                <a href="url_for('.post', id=post.id) #comments">
-                    <span class="label label-primary">{{ post.comments.count() }} Comments</span>
-                </a>
-            </div>
-        </div>
+        </li>
     </li>
     {% endfor %}
 </ul>

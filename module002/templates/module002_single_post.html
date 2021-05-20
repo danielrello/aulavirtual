@@ -2,45 +2,55 @@
 {% import "bootstrap/wtf.html" as wtf %}
 
 {% block content %}
-<div class="new-comment">
-    <div class="new-comment-form">
-        <div class="comment-form">
-            <form class="row g-3 align-items-baseline" method="post" action="{{ url_for('module002.module002_new_comment', id=post.id) }}">
-            {{ form.hidden_tag() }}
-            <div class="input-group mb-3">
-                <div class="form-control">{{ wtf.form_field(form.body) }}</div>
-              <span class="input-group-text">{{ wtf.form_field(form.submit_button) }}</span>
-            </div>
-        </div>
-    </div>
-</div>
-<div class="post">
+<div class="jumbotron post py-3">
     <div class="post-content">
-        <div class="post-title"><a href="{{ url_for('module002.module002_post_comments', id=post.id) }}">
-            {{ post.title }}</a>
+        <div class="d-flex align-items-center justify-content-between w-100">
+                <h2>{{ post.title }}</h2><small>{{ post.timeago }}</small>
         </div>
-        <div class="post-date">{{ post.timeago }}</div>
-        <div class="post-author"><a href="url_for('.user', username=post.author.username)">Posted by {{ post.author.username }}</a></div>
+        <div class="lead post-author">
+            <small>Posted by <a href="url_for('.user', username=post.author.username)">{{ post.author.username }}</a></small>
+        </div>
+    <hr class="my-4">
+        <p class="container">
+            {% if post.body_html %}
+                {{ post.body_html | safe }}
+            {% else %}
+                {{ post.body }}
+            {% endif %}
+        </p>
     </div>
-    <div class="post-comments">
-        {% for comment in comments %}
-            <div class="border border-5 item-hover rounded border-light p-2  comment">
-                <div class="avatar-img"
-                    style="background-image:url({{ avatars.gravatar(comment.author.avatar_hash, size='46', default='retro') }})">
-                </div>
-                <div class="comment-body">
-                    <h5 class="my-1">{{ comment.author.username }} · {{ comment.timeago }}</h5>
-                    <p class="my-1">
-                    {% if comment.body_html %}
-                        {{ comment.body_html | safe }}
-                    {% else %}
-                        {{ comment.body }}
-                    {% endif %}
-                    </p>
+    <div class="comment-form py-2">
+        <form class="row g-3 align-items-baseline" method="post" action="{{ url_for('module002.module002_new_comment', id=post.id) }}">
+        {{ form.hidden_tag() }}
+            <div class="input-group mb-3 justify-content-center">
+                {{ form.body(class_="form-control") }}
+                <div class="input-group-append">
+                    {{ form.submit_button(class_="btn btn-outline-secondary") }}
                 </div>
             </div>
-        {% endfor %}
+        </form>
     </div>
+    <ul class="list-group">
+        {% for comment in comments %}
+            <li class="list-group-item list-group-item-action p-2 ">
+                <div class="d-flex px-1">
+                    <div class="avatar-img mx-2"
+                        style="background-image:url({{ avatars.gravatar(comment.author.avatar_hash, size='46', default='retro') }})">
+                    </div>
+                    <div class="comment-body">
+                        <h5 class="my-1">{{ comment.author.username }} · {{ comment.timeago }}</h5>
+                        <p class="my-1">
+                        {% if comment.body_html %}
+                            {{ comment.body_html | safe }}
+                        {% else %}
+                            {{ comment.body }}
+                        {% endif %}
+                        </p>
+                    </div>
+                </div>
+            </li>
+        {% endfor %}
+    </ul>
 </div>
     <script>
     $(document).ready(function (){

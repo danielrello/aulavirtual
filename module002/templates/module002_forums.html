@@ -1,19 +1,15 @@
-<ul class="forums">
+<ul class="list-group">
     {% for forum in forums %}
-    <li class="forum">
-        <div class="forum-thumbnail">
-            <a href="url_for('.user', username=forum.author.username)">
-                <img class="img-rounded profile-thumbnail" src="">
-            </a>
-        </div>
+    <li class="list-group-item list-group-item-action list-group-item-secondary p-3"
+    onclick='window.location.href="{{ url_for('module002.module002_forum_posts', id=forum.id) }}"'>
         <div class="forum-content">
-            <div class="forum-title"><a href="{{ url_for('module002.module002_forum_posts', id=forum.id) }}">
-                {{ forum.title }}</a>
+            <div class="forum-title d-flex justify-content-between align-items-center">
+                <h5>{{ forum.title }}</h5>
+                <small class="forum-date">{{ forum.timeago }}</small>
             </div>
-            <div class="forum-date">{{ forum.timeago }}</div>
-            <div class="forum-author">
-                <a href="url_for('.user', username=forum.author.username)">Created by {{ forum.author.username }}</a>
-            </div>
+            <small class="forum-author">
+                Created by <a href="url_for('.user', username=forum.author.username)">{{ forum.author.username }}</a>
+            </small>
             <div class="forum-course">
                 {% if forum.course %}
                     {{ forum.course.name }}

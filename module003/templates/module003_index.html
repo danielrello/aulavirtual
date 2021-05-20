@@ -1,25 +1,32 @@
 {% extends 'base.html' %}
 
-{% block content %} 
-	<h1> Activities </h1>
-    <p>Select an activity from the following courses</p>
-    <div class="courses">
-        {% for course in courses %}
-            <div class="course">
-            <div class="course-head">
-                <h2>{{ course.title }}</h2>
-                <h2>{{ course.code }}</h2>
+{% block content %}
+    <div class="d-flex flex-row flex-nowrap justify-content-start">
+        <div class="list-group mr-4 mt-4" style="width:15%">
+            <a class="list-group-item list-group-item-action list-group-item-dark"
+            href="{{ url_for("module003.module003_new_activity") }}">Create Activity</a>
+        </div>
+        <div class="main">
+            <h1> Activities </h1>
+            <p>Select an activity from the following courses</p>
+            <div class="courses">
+                {% for course in courses %}
+                    <div class="course">
+                        <div class="course-head">
+                            <h2>{{ course.name }}</h2>
+                        </div>
+                        <h3>Professor: {{ course.author.username }}</h3>
+                        <div class="activities">
+                        {% for activity in course.activities %}
+                            <div class="activity">
+                                <h3>{{ activity.title }}</h3>
+                                <p>{{ activity.limit_datestr }}</p>
+                            </div>
+                        {% endfor %}
+                        </div>
+                    </div>
+                {% endfor %}
             </div>
-            <h3>Professor: {{ course.author }}</h3>
-            <div class="activities">
-            {% for activity in activities %}
-                <div class="activity">
-                    <h3>{{ activity.title }}</h3>
-                    <p>{{ activity.limit_date }}</p>
-                </div>
-            {% endfor %}
-            </div>
-            {% endfor %}
-            </div>
+        </div>
     </div>
 {% endblock %} 
