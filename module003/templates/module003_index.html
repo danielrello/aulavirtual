@@ -9,22 +9,32 @@
         <div class="main">
             <h1> Activities </h1>
             <p>Select an activity from the following courses</p>
-            <div class="courses">
+            <div id="accordion">
                 {% for course in courses %}
-                    <div class="course">
+                  <div class="card">
+                    <div class="card-header" id="heading{{ course.code }}">
+                      <h5 class="mb-0">
+                        <button class="btn btn-link" data-toggle="collapse" data-target="#collapse{{ course.code }}" aria-expanded="true" aria-controls="collapse{{ course.name }}">
                         <div class="course-head">
-                            <h2>{{ course.name }}</h2>
+                            <h2>{{ course.name }} | Professor: {{ course.author.username }}</h2>
                         </div>
-                        <h3>Professor: {{ course.author.username }}</h3>
-                        <div class="activities">
-                        {% for activity in course.activities %}
-                            <div class="activity">
-                                <h3>{{ activity.title }}</h3>
-                                <p>{{ activity.limit_datestr }}</p>
-                            </div>
-                        {% endfor %}
-                        </div>
+                        </button>
+                      </h5>
                     </div>
+                    <div id="collapse{{ course.code }}" class="collapse show" aria-labelledby="heading{{ course.code }}" data-parent="#accordion">
+                      <div class="card-body">
+                        <div class="list-group">
+            {% for activity in course.activities %}
+                            <div class="list-group-item list-group-item-action list-group-item-secondary"
+                             onclick='window.location.href="{{ url_for('module003.module003_single_activity', id=activity.id) }}"'>
+                                <h3>{{ activity.title }}</h3>
+                                <p>Limit time: {{ activity.limit_datestr }}</p>
+                            </div>
+                        </div>
+            {% endfor %}
+                      </div>
+                    </div>
+                  </div>
                 {% endfor %}
             </div>
         </div>

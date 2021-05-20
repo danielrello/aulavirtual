@@ -40,7 +40,7 @@ def module002_forum_posts():
     forum_id = request.args.get('id')
     query = Forum.query
     page = request.args.get('page', 1, type=int)
-    forum = query.filter(Forum.id == forum_id).first()
+    forum = query.get(id=forum_id)
     forum.timeago = timeago.format(forum.timestamp, datetime.datetime.now())
     course = None
     if forum.course_id is not None:

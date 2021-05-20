@@ -1,5 +1,6 @@
 import datetime
 
+import timeago
 from flask import Blueprint, render_template, request, current_app, flash, redirect, url_for
 from flask_login import current_user, login_required
 
@@ -13,22 +14,43 @@ module003 = Blueprint("module003", __name__, static_folder="static", template_fo
 def module003_index():
     page = request.args.get('page', 1, type=int)
     query = Course.query
+    courses_author_pagination = query.filter_by(user_id=current_user.id).paginate(
+        page, per_page=current_app.config['FLASKY_POSTS_PER_PAGE'],
+        error_out=False)
     follow_courses = Follow.query
     pagination = follow_courses.filter_by(user_id=current_user.id).paginate(
         page, per_page=current_app.config['FLASKY_POSTS_PER_PAGE'],
         error_out=False)
     follows = pagination.items
+    courses_author = courses_author_pagination.items
     courses = []
-    for follow in follows:
-        course = Course.query.get(follow.course_id)
-        courses.append(course)
+    for course in courses_author:
         if course.id is not None:
             author = User.query.get(course.user_id)
             course.author = author
         for activity in course.activities:
             activity.limit_datestr = activity.limit_date.strftime("%Y-%m-%d %H:%M:%S")
+        courses.append(course)
+    for follow in follows:
+        course = Course.query.get(follow.course_id)
+        if course.id is not None:
+            author = User.query.get(course.user_id)
+            course.author = author
+        for activity in course.activities:
+            activity.limit_datestr = activity.limit_date.strftime("%Y-%m-%d %H:%M:%S")
+        courses.append(course)
     return render_template("module003_index.html", module='module003', courses=courses)
 
+
+@module003.route('/activity', methods=['GET'])
+@login_required
+def module003_single_activity():
+    activity_id = request.args.get('id')
+    query = Activity.query
+    activity = query.get(activity_id)
+    activity.timeago = timeago.format(activity.timestamp, datetime.datetime.now())
+    activity.time_left = activity.limit_date.strftime("%Y-%m-%d %H:%M:%S")
+    return render_template('module003_single_activity.html', module="module003", activity=activity)
 
 @module003.route('/new_activity', methods=['GET', 'POST'])
 @login_required
@@ -61,7 +83,7 @@ def module003_new_activity():
         else:
             flash("Couldn't create a new activity")
 
-    return render_template('module003_new_activity.html', module="module002", form=form)
+    return render_template('module003_new_activity.html', module="module003", form=form)
 
 
 @module003.route('/test')
