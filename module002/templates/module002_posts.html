@@ -1,15 +1,15 @@
-<ul class="list-group">
+<ul class="list-group pt-3">
     {% for post in posts %}
-    <li class="list-group-item list-group-item-action list-group-item-secondary flex-column align-items-start">
-          <div class="d-flex w-100 justify-content-between">
-            <h5 class="mb-1"><a href="url_for('.user', username=post.author.username)">{{ post.author.username }}</a></h5>
-            <small>{{ post.timeago }}</small>
-          </div>
+    <li class="list-group-item list-group-item-action list-group-item-secondary flex-column align-items-start"
+        onclick="window.location.href='{{ url_for('module002.module002_post_comments', id=post.id) }}'">
           <div class="card-body">
             <h5 class="card-title">
-                <div class="post-title">
-                    <a href={{ url_for('module002.module002_post_comments', id=post.id) }}>{{ post.title }}</a>
+                <div class="d-flex w-100 justify-content-between">
+                    <h5>{{ post.title }}</h5><small>{{ post.timeago }}</small>
                 </div>
+                <small>
+                Posted by <a href="url_for('.user', username=post.author.username)">{{ post.author.username }}</a>
+                </small>
             </h5>
             <p class="card-text">
                 {% if post.body_html %}

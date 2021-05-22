@@ -41,6 +41,7 @@ app.config['MAIL_PASSWORD'] = configuration['gmail_password']
 app.config['FLASKY_MAIL_SUBJECT_PREFIX'] = '[Aula Virtual] '
 app.config['FLASKY_MAIL_SENDER'] = 'Prof. Manoel Gadi'
 app.config['FLASKY_POSTS_PER_PAGE'] = configuration['FLASKY_POSTS_PER_PAGE']
+app.config['UPLOAD_FOLDER'] = configuration['UPLOAD_FOLDER']
 
 
 from mail import init_mail

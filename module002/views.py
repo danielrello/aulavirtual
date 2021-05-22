@@ -20,7 +20,7 @@ def module002_index():
             error_out=False)
         forums = pagination.items
         for forum in forums:
-            forum.timeago = timeago.format(forum.timestamp, datetime.datetime.now())
+            forum.timeago = timeago.format(forum.timestamp, datetime.datetime.utcnow())
             if forum.course_id is not None:
                 course = Course.query.get(forum.course_id)
                 forum.course = course
@@ -40,8 +40,8 @@ def module002_forum_posts():
     forum_id = request.args.get('id')
     query = Forum.query
     page = request.args.get('page', 1, type=int)
-    forum = query.get(id=forum_id)
-    forum.timeago = timeago.format(forum.timestamp, datetime.datetime.now())
+    forum = query.get(forum_id)
+    forum.timeago = timeago.format(forum.timestamp, datetime.datetime.utcnow())
     course = None
     if forum.course_id is not None:
         course = Course.query.get(forum.course_id)
@@ -53,7 +53,7 @@ def module002_forum_posts():
         error_out=False)
     posts = pagination.items
     for post in posts:
-        post.timeago = timeago.format(post.timestamp, datetime.datetime.now())
+        post.timeago = timeago.format(post.timestamp, datetime.datetime.utcnow())
         post.author = User.query.get(post.author_id)
     return render_template('module002_single_forum.html', module="module002", forum=forum, posts=posts)
 
@@ -67,14 +67,14 @@ def module002_post_comments():
     page = request.args.get('page', 1, type=int)
     post = query.filter(Post.id == post_id).first()
     author = User.query.get(post.author_id)
-    post.timeago = timeago.format(post.timestamp, datetime.datetime.now())
+    post.timeago = timeago.format(post.timestamp, datetime.datetime.utcnow())
     post.author = author
     pagination = Comment.query.filter(Comment.post_id == post_id).paginate(
         page, per_page=current_app.config['FLASKY_POSTS_PER_PAGE'],
         error_out=False)
     comments = pagination.items
     for comment in comments:
-        comment.timeago = timeago.format(comment.timestamp, datetime.datetime.now())
+        comment.timeago = timeago.format(comment.timestamp, datetime.datetime.utcnow())
         comment.author = User.query.get(comment.author_id)
     return render_template('module002_single_post.html', module="module002", form=form, post=post, comments=comments)
 

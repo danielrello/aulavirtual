@@ -4,7 +4,7 @@ import bleach
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import UserMixin
 from mistune import markdown
-import hashlib
+
 db = None
 
 
@@ -41,11 +41,12 @@ class User(UserMixin, db.Model):  # User extends db.Model
     confirmed = db.Column(db.Boolean(), default=False)
     avatar_hash = db.Column(db.String, default='00000000000000000000000000000000')
     userhash = db.Column(db.String(50))
-    date_created = db.Column(db.DateTime, default=db.func.current_timestamp())
-    date_modified = db.Column(db.DateTime, default=db.func.current_timestamp(),
-                              onupdate=db.func.current_timestamp())
+    date_created = db.Column(db.DateTime, default=datetime.datetime.utcnow)
+    date_modified = db.Column(db.DateTime, default=datetime.datetime.utcnow,
+                              onupdate=datetime.datetime.utcnow)
     course = db.relationship('Course', backref='user', lazy=True)
     comments = db.relationship('Comment', backref='author', lazy='dynamic')
+    activities_result = db.relationship('ActivityResult', backref='user', lazy=True)
 
 
 class Forum(db.Model):
@@ -55,7 +56,7 @@ class Forum(db.Model):
     course_id = db.Column(db.Integer, db.ForeignKey('course.id'))
     author_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     posts = db.relationship('Post', backref='forums', lazy='dynamic')
-    timestamp = db.Column(db.DateTime, default=db.func.current_timestamp())
+    timestamp = db.Column(db.DateTime, default=datetime.datetime.utcnow)
 
 
 class Post(db.Model):
@@ -64,7 +65,7 @@ class Post(db.Model):
     title = db.Column(db.Text)
     body = db.Column(db.Text)
     body_html = db.Column(db.Text)
-    timestamp = db.Column(db.DateTime, default=db.func.current_timestamp())
+    timestamp = db.Column(db.DateTime, default=datetime.datetime.utcnow)
     author_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     forum_id = db.Column(db.Integer, db.ForeignKey('forums.id'))
     comments = db.relationship('Comment', backref='post', lazy='dynamic')
@@ -77,21 +78,23 @@ class Activity(db.Model):
     activity_uploads = db.Column(db.Text, default='Empty')
     body = db.Column(db.Text)
     body_html = db.Column(db.Text)
-    timestamp = db.Column(db.DateTime, default=db.func.current_timestamp())
-    limit_date = db.Column(db.DateTime, default=db.func.curret_timestamp())
+    timestamp = db.Column(db.DateTime, default=datetime.datetime.utcnow)
+    limit_date = db.Column(db.DateTime, default=datetime.datetime.utcnow)
     author_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     course_id = db.Column(db.Integer, db.ForeignKey('course.id'))
+    results = db.relationship('ActivityResult', backref='activity', lazy=True)
+
 
 class ActivityResult(db.Model):
-    __tablename__=' activityresult'
+    __tablename__ = 'activityresult'
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.relationship('User', backref='activityresult', lazy=True)
-    activity_id = db.relationship('Activity', backref='activityresult', lazy=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    activity_id = db.Column(db.Integer, db.ForeignKey('activities.id'))
     activity_grade = db.Column(db.String(50))
     body_html = db.Column(db.Text)
     body = db.Column(db.Text)
     files = db.Column(db.Text)
-    date_created = db.Column(db.DateTime, default=db.func.current_timestamp())
+    date_created = db.Column(db.DateTime, default=datetime.datetime.utcnow)
 
 
 class Comment(db.Model):
@@ -99,7 +102,7 @@ class Comment(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     body = db.Column(db.Text)
     body_html = db.Column(db.Text)
-    timestamp = db.Column(db.DateTime, index=True, default=db.func.current_timestamp())
+    timestamp = db.Column(db.DateTime, index=True, default=datetime.datetime.utcnow)
     disabled = db.Column(db.Boolean, default=None)
     author_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     post_id = db.Column(db.Integer, db.ForeignKey('posts.id'))
@@ -119,9 +122,9 @@ class Course(UserMixin, db.Model):  # User extends db.Model
     institution_name = db.Column(db.String(50))
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
     code = db.Column(db.String(50), unique=True)
-    date_created = db.Column(db.DateTime, default=db.func.current_timestamp())
-    date_modified = db.Column(db.DateTime, default=db.func.current_timestamp(),
-                              onupdate=db.func.current_timestamp())
+    date_created = db.Column(db.DateTime, default=datetime.datetime.utcnow)
+    date_modified = db.Column(db.DateTime, default=datetime.datetime.utcnow,
+                              onupdate=datetime.datetime.utcnow)
     follows = db.relationship('Follow', backref='course', lazy=True)
     activities = db.relationship('Activity', backref='course', lazy=True)
 
@@ -130,12 +133,8 @@ class Follow(UserMixin, db.Model):  # User extends db.Model
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
     course_id = db.Column(db.Integer, db.ForeignKey('course.id'), nullable=False)
-    course_name = db.Column(db.String(50))
-    course_code = db.Column(db.String(50))
-    institution_name = db.Column(db.String(50))
-    date_created = db.Column(db.DateTime, default=db.func.current_timestamp())
-    date_modified = db.Column(db.DateTime, default=db.func.current_timestamp(),
-                              onupdate=db.func.current_timestamp())
+    date_created = db.Column(db.DateTime, default=datetime.datetime.utcnow)
+
 
 
 class ParticipationCode(UserMixin, db.Model):  # User extends db.Model
@@ -148,9 +147,9 @@ class ParticipationCode(UserMixin, db.Model):  # User extends db.Model
     course_name = db.Column(db.String(50))
     institution_name = db.Column(db.String(50))
     date_expire = db.Column(db.DateTime)
-    date_created = db.Column(db.DateTime, default=db.func.current_timestamp())
-    date_modified = db.Column(db.DateTime, default=db.func.current_timestamp(),
-                              onupdate=db.func.current_timestamp())
+    date_created = db.Column(db.DateTime, default=datetime.datetime.utcnow)
+    date_modified = db.Column(db.DateTime, default=datetime.datetime.utcnow,
+                              onupdate=datetime.datetime.utcnow)
 
 
 class ParticipationRedeem(UserMixin, db.Model):  # User extends db.Model
@@ -161,6 +160,6 @@ class ParticipationRedeem(UserMixin, db.Model):  # User extends db.Model
     course_id = db.Column(db.Integer, db.ForeignKey('course.id'), nullable=False)
     course_name = db.Column(db.String(50))
     institution_name = db.Column(db.String(50))
-    date_created = db.Column(db.DateTime, default=db.func.current_timestamp())
-    date_modified = db.Column(db.DateTime, default=db.func.current_timestamp(),
-                              onupdate=db.func.current_timestamp())
+    date_created = db.Column(db.DateTime, default=datetime.datetime.utcnow)
+    date_modified = db.Column(db.DateTime, default=datetime.datetime.utcnow,
+                              onupdate=datetime.datetime.utcnow)

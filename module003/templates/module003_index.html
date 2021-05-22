@@ -3,8 +3,10 @@
 {% block content %}
     <div class="d-flex flex-row flex-nowrap justify-content-start">
         <div class="list-group mr-4 mt-4" style="width:15%">
+        {% if current_user.profile in ('professor', 'admin', 'staff') %}
             <a class="list-group-item list-group-item-action list-group-item-dark"
             href="{{ url_for("module003.module003_new_activity") }}">Create Activity</a>
+        {% endif %}
         </div>
         <div class="main">
             <h1> Activities </h1>

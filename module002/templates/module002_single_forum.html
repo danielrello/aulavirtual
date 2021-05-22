@@ -11,22 +11,26 @@
             <img class="img-rounded profile-thumbnail" src="">
         </a>
     </div>
-    <div class="forum-content">
-        <div class="forum-title"><a href="{{ url_for('module002.module002_forum_posts', id=forum.id) }}">
-            {{ forum.title }}</a>
+    <div class="forum-content jumbotron">
+        <div class="d-flex align-items-center justify-content-between w-100">
+                <h2>{{ forum.title }}</h2> · <small>{{ forum.timeago }}</small>
         </div>
-        <div class="forum-date">{{ forum.timeago }}</div>
-        <div class="forum-author">
-            <a href="url_for('.user', username=forum.author.username)">Created by {{ forum.author.username }}</a>
-        </div>
-        <div class="forum-course">
+    <hr class="my-4">
+        <div class="lead post-author">
+            <p class="row">
+                <small>Posted by <a href="url_for('.user', username=post.author.username)"> {{ forum.author.username }}</a></small>
+            </p>
+            <div class="row">
             {% if forum.course %}
-                {{ forum.course.name }}
+                <b>{{ forum.course.name }}</b>
             {% else %}
-                {{ "This forum has no course related to it" }}
+                <b>{{ "This forum has no course related to it" }}</b>
             {% endif %}
+            </div>
+        </div>
+        <div class="forum-course container">
+    {% include 'module002_posts.html' %}
         </div>
     </div>
-    {% include 'module002_posts.html' %}
 </div>
 {% endblock %}

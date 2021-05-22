@@ -17,14 +17,54 @@
         </div>
     <hr class="my-4">
     </div>
-    <div class="activity-content">
-        {% if current_user.profile in ('admin', 'staff', 'professor') %}
-        {{ form.activity_grade(class_="form-control") }}
-            {% if  %}
-        {% else %}
-        {{ form.body(class_="form-control") }}
-        {{ form.files(class_="form-control") }}
-        {% endif %}
-    </div>
+    {% if current_user.profile in ('admin', 'staff', 'professor') %}
+        {% for result in activity.results %}
+            <div class="result">
+                <div class="result-header">
+                    {{ result.author.username }}
+                </div>
+                <div>
+                    {{ result.body }}
+                    Download Files: <a href="{{ url_for('module003.download',filename=result.files) }}">{{ result.files }}</a>
+                </div>
+                <div>
+                <form class="activity-grade form-group"
+                      action="{{url_for('module003.module003_new_result', id=result.id)}}" method="POST">
+                    {% if result.activity_grade %}
+                    Grade:{{ result.activity_grade }} <button onclick="$('#activity-grade').show()"
+                            id="edit_grade" type="button" class="btn btn-primary">Edit</button>
+                    {% endif %}
+                    <p id="activity-grade">Grade: {{ form.activity_grade() }}</p>
+                    <input type="submit" class="btn btn-primary" id="submit_button" value="Evaluate">
+                </form>
+                </div>
+            {% if loop.last == False %}
+            <hr class="my-2">
+            {% endif %}
+            </div>
+        {% endfor %}
+    {% else %}
+    <form class="activity-content form-group" enctype="multipart/form-data"
+          action="{{url_for('module003.module003_new_result', id=activity.id)}}" method="POST">
+        {{ form.hidden_tag() }}
+        {{ form.body(class_="form-control", type="textarea") }}
+        {{ form.files }}
+        {{ form.submit_button(class_="form-control") }}
+    </form>
+    {% endif %}
 </div>
+{% endblock %}
+{% block scripts_next %}
+    <script>
+    $(document).ready(function () {
+        if($('#edit_grade').length > 0){
+            $('#activity-grade').hide();
+        }
+    $('.activity-grade > #submit_button').hide();
+        $('#activity-grade>select').on('change', function (){
+           console.log("showing");
+           $('.activity-grade > #submit_button').show();
+       });
+    });
+    </script>
 {% endblock %}

@@ -7,5 +7,6 @@
     "SECRET_KEY": "123456",
     "MODE": "dev",
     "FLASKY_POSTS_PER_PAGE": 10,
-    "mysql_databasename": "danirello$aulavirtual"
+    "mysql_databasename": "danirello$aulavirtual",
+    "UPLOAD_FOLDER": "uploads"
 }

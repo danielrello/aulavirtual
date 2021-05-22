@@ -56,14 +56,13 @@
               <tbody>
                 {% for row in rows %}
                 <tr>
-
                    <td> <a><form action="{{url_for('module001.module001_unfollow')}}" method="GET">
-                       <input type="submit" value={{ row.course_code }} name="code">
+                       <input type="submit" value={{ row.course.code }} name="code">
                    </form> </a></td>
 
-                    <td>{{ row.course_name }}</td>
-                    <td>{{ row.course_code }}</td>
-                    <td>{{ row.institution_name }}</td>
+                    <td>{{ row.course.name }}</td>
+                    <td>{{ row.course.code }}</td>
+                    <td>{{ row.course.institution_name }}</td>
 
                     <td> <a><form action="/profile" method="GET">
                        <input type="submit" value={{ row.user_id }} name="rowid">
