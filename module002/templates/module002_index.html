@@ -6,8 +6,10 @@
     <h1>Hello, {% if current_user.is_authenticated %}{{ current_user.username }}{% else %}Stranger{% endif %}!</h1>
     <h2>You are logged as {{ current_user.profile }}</h2>
 </div>
+    {% if current_user.profile in('professor', 'admin', 'staff') %}
 <div class="d-flex justify-content-center p-3">
     <a class="btn btn-primary" href={{url_for('module002.module002_new_forum')}}>New Forum</a>
 </div>
+    {% endif %}
 {% include 'module002_forums.html' %}
 {% endblock %}

@@ -123,25 +123,54 @@ def module002_new_comment():
 @login_required
 def module002_new_post():
     form = PostForm()
-    if request.method == 'GET' and request.args.get('forum_id'):
+    forum_id = -1
+    forum_preselected = None
+    if request.args.get('forum_id'):
         forum_id = request.args.get('forum_id')
-        forum = Forum.query.filter(Forum.id == forum_id).first()
-        form.forum_id.choices = [(forum.id, forum.title)]
-    else:
-        form.forum_id.choices += [("", "---")]
-        for forum in Forum.query.all():
+        forum_preselected = Forum.query.filter(Forum.id == forum_id).first()
+        form.forum_id.choices += [(str(forum_preselected.id), forum_preselected.title)]
+        form.forum_id.default = [(str(forum_preselected.id), forum_preselected.title)]
+    for forum in Forum.query.all():
+        if forum != forum_preselected:
+            form.forum_id.choices += [(str(forum.id), forum.title)]
+    if request.method == 'POST':
+        if current_user.is_authenticated and form.validate_on_submit():
+            forum_id = form.forum_id.data
+            post = Post(body=form.body.data,
+                        author_id=current_user.id,
+                        title=form.title.data,
+                        forum_id=forum_id)
+            try:
+                db.session.add(post)
+                db.session.commit()
+                flash("Post added correctly")
+                return redirect(url_for('module002.module002_forum_posts', id=forum_id))
+            except:
+                flash("Could not add your post")
+        else:
+            flash("Could not verify your post {}".format(form.errors))
+    return render_template('module002_new_post.html', module="module002", form=form)
+
+
+@module002.route('/edit_post', methods=['GET', 'POST'])
+@login_required
+def module002_edit_post():
+    form = PostForm()
+    post_id = request.args.get('id')
+    post = Post.query.get(post_id)
+    form.forum_id.choices += [(post.forum_id, Forum.query.get(post.forum_id).title)]
+
+    forums = Forum.query.filter_by(author_id=current_user.id)
+    follows = Follow.query.filter_by(user_id=current_user.id)
+    for follow in follows:
+        forums += Forum.query.get(follow.id)
+    form.body.data = post.body
+    form.title.data = post.title
+    for forum in forums:
+        if forum.id != post.forum_id:
             form.forum_id.choices += [(forum.id, forum.title)]
     if request.method == 'POST':
         if current_user.is_authenticated and form.validate_on_submit():
-            none_forum = Forum.query.filter(Forum.title == 'None Forum').first()
-            if none_forum == None:
-                none_forum = Forum(title='None Forum',
-                                   author_id=current_user.id)
-                db.session.add(none_forum)
-                db.session.commit()
-                forum_id = none_forum.id
-            else:
-                forum_id = form.forum_id.data
             post = Post.query.get(request.args.get('id'))
             if post:
                 post.title = form.title.data
@@ -150,42 +179,11 @@ def module002_new_post():
                 try:
                     db.session.commit()
                     flash("Post modified correctly")
+                    return redirect(url_for('module002.module002_forum_posts', id=post.forum_id))
                 except:
                     flash("Could not modify your post")
             else:
-                post = Post(body=form.body.data,
-                            author_id=current_user.id,
-                            title=form.title.data,
-                            forum_id=forum_id)
-                try:
-                    db.session.add(post)
-                    db.session.commit()
-                    flash("Post added correctly")
-                except:
-                    flash("Could not add your post")
-            return redirect(url_for('module002.module002_forum_posts', id=forum_id))
-    return render_template('module002_new_post.html', module="module002", form=form)
-
-
-@module002.route('/edit_post', methods=['GET', 'POST'])
-@login_required
-def module002_edit_post():
-    form = PostForm()
-    if request.method == 'GET' and request.args.get('id'):
-        post_id = request.args.get('id')
-        post = Post.query.get(post_id)
-        form.forum_id.choices += [(post.forum_id, Forum.query.get(post.forum_id).title)]
-        form.forum_id.choices += [("", "---")]
-
-        forums = Forum.query.filter_by(author_id=current_user.id)
-        follows = Follow.query.filter_by(user_id=current_user.id)
-        for follow in follows:
-            forums += Forum.query.get(follow.id)
-        form.body.data = post.body
-        form.title.data = post.title
-        for forum in forums:
-            if forum.id != post.forum_id:
-                form.forum_id.choices += [(forum.id, forum.title)]
+                flash("No post was selected")
     return render_template('module002_new_post.html', module="module002", form=form, post=post)
 
 
