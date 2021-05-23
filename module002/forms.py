@@ -2,6 +2,7 @@ import wtforms
 from flask_wtf import FlaskForm
 from wtforms import StringField, SelectField, SubmitField
 from wtforms.validators import DataRequired
+from wtforms.widgets import TextArea
 
 from models import Forum
 
@@ -9,7 +10,7 @@ from models import Forum
 class PostForm(FlaskForm):
     title = StringField("Post Title:", validators=[DataRequired()])
     forum_id = SelectField("Forum:", choices=[])
-    body = StringField("What's on your mind?", validators=[DataRequired()])
+    body = StringField("What's on your mind?", validators=[DataRequired()], widget=TextArea())
 
 
 class ForumForm(FlaskForm):
@@ -18,5 +19,5 @@ class ForumForm(FlaskForm):
 
 
 class CommentForm(FlaskForm):
-    body = StringField('', validators=[DataRequired()], render_kw={"placeholder": "What up?"})
+    body = StringField('', validators=[DataRequired()], render_kw={"placeholder": "What up?"}, widget=TextArea())
     submit_button = SubmitField('Send Comment')

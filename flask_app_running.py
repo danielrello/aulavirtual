@@ -42,7 +42,8 @@ app.config['FLASKY_MAIL_SUBJECT_PREFIX'] = '[Aula Virtual] '
 app.config['FLASKY_MAIL_SENDER'] = 'Prof. Manoel Gadi'
 app.config['FLASKY_POSTS_PER_PAGE'] = configuration['FLASKY_POSTS_PER_PAGE']
 app.config['UPLOAD_FOLDER'] = configuration['UPLOAD_FOLDER']
-
+app.jinja_env.trim_blocks = True
+app.jinja_env.lstrip_blocks = True
 
 from mail import init_mail
 mail = init_mail(app)

@@ -23,17 +23,17 @@
                         </button>
                       </h5>
                     </div>
-                    <div id="collapse{{ course.code }}" class="collapse show" aria-labelledby="heading{{ course.code }}" data-parent="#accordion">
+                    <div id="collapse{{ course.code }}" class="collapse" aria-labelledby="heading{{ course.code }}" data-parent="#accordion">
                       <div class="card-body">
                         <div class="list-group">
             {% for activity in course.activities %}
                             <div class="list-group-item list-group-item-action list-group-item-secondary"
-                             onclick='window.location.href="{{ url_for('module003.module003_single_activity', id=activity.id) }}"'>
+                             onclick='window.location.href="{{ url_for('module003.module003_single_activity', activity_id=activity.id) }}"'>
                                 <h3>{{ activity.title }}</h3>
                                 <p>Limit time: {{ activity.limit_datestr }}</p>
                             </div>
-                        </div>
             {% endfor %}
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -41,4 +41,4 @@
             </div>
         </div>
     </div>
-{% endblock %} 
+{% endblock %}

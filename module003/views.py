@@ -50,18 +50,24 @@ def module003_index():
 @login_required
 def module003_single_activity():
     form = ActivityResultForm()
-    activity_id = request.args.get('id')
-    query = Activity.query
-    activity = query.get(activity_id)
+    activity_id = request.args.get('activity_id')
+    result_id = request.args.get('result_id')
+    result = ActivityResult.query.get(result_id)
+    activity = Activity.query.get(activity_id)
     page = request.args.get('page', 1, type=int)
+    has_result = ActivityResult.query.filter(and_(
+        ActivityResult.activity_id == activity.id, ActivityResult.user_id == current_user.id)).first()
     if current_user.profile in ('admin', 'staff', 'professor'):
-        pagination = ActivityResult.query.filter_by(activity_id=activity_id).paginate(
+        pagination = ActivityResult.query.filter_by(activity_id=activity.id).paginate(
             page, per_page=current_app.config['FLASKY_POSTS_PER_PAGE'],
             error_out=False)
         results = pagination.items
         for result in results:
             result.author = User.query.get(result.user_id)
-        activity.results = results
+        if results:
+            activity.results = results
+    elif has_result:
+        activity.result = has_result
     activity.timeago = timeago.format(activity.timestamp, datetime.datetime.utcnow())
     activity.time_left = activity.limit_date.strftime("%Y-%m-%d %H:%M:%S")
     return render_template('module003_single_activity.html', form=form, module="module003", activity=activity)
@@ -77,18 +83,20 @@ def download(filename):
 @login_required
 def module003_new_result():
     form = ActivityResultForm()
-    activity_id = request.args.get('id')
-    activity = Activity.query.get(activity_id)
+    activity_id = request.args.get('activity_id')
     if request.method == 'POST':
         if current_user.profile in 'student':
-            user = ActivityResult.query.filter(and_(ActivityResult.user_id==current_user.id,
-                                                    ActivityResult.activity_id==activity_id)).first()
+            user = ActivityResult.query.filter(and_(ActivityResult.user_id == current_user.id,
+                                                    ActivityResult.activity_id == activity_id)).first()
             if user:
                 flash("You have already sent your result")
                 return module003_single_activity()
             file = form.files.data
-            filename = secure_filename(file.filename)
-            file.save(os.path.join(app.config['UPLOAD_FOLDER']) + '/' + filename)
+            if file:
+                filename = secure_filename(file.filename)
+                file.save(os.path.join(app.config['UPLOAD_FOLDER']) + '/' + filename)
+            else:
+                filename='Empty'
             form.activity_grade.data = 'None'
             if current_user.is_authenticated and form.validate_on_submit():
                 result = ActivityResult(user_id=current_user.id,
@@ -105,7 +113,7 @@ def module003_new_result():
             else:
                 flash("Couldn't upload the activity result")
         else:
-            result_id = request.args.get('id')
+            result_id = request.args.get('result_id')
             activity_result = ActivityResult.query.get(result_id)
             activity_result.activity_grade = form.activity_grade.data
             try:
@@ -123,20 +131,19 @@ def module003_new_activity():
     form = ActivityForm()
     for course in Course.query.filter(Course.user_id == current_user.id):
         form.course_id.choices += [(course.id, str(course.id) + '-' + course.name + '-' + course.institution_name)]
-    for i in range(0, 24):
-        form.limit_hour.choices += [str(i)]
-    for i in range(0, 60):
-        form.limit_min.choices += [str(i)]
-        form.limit_sec.choices += [str(i)]
     if request.method == 'POST':
         file = form.files.data
-        form_limit = form.limit_date.data.strftime("%Y-%m-%d")
-        form_limit += " " + form.limit_hour.data + ":" + form.limit_min.data + ":" + form.limit_sec.data
-        limit_date = datetime.datetime.strptime(form_limit, "%Y-%m-%d %H:%M:%S")
+        if file:
+            filename = secure_filename(file.filename)
+            file.save(os.path.join(app.config['UPLOAD_FOLDER']) + '/' + filename)
+        else:
+            filename = 'Empty'
+        limit_date = datetime.datetime.combine(form.date_expire.data, form.time_expire.data)
         if current_user.is_authenticated and form.validate_on_submit():
             activity = Activity(author_id=current_user.id,
                                 title=form.title.data,
                                 course_id=form.course_id.data,
+                                activity_uploads=filename,
                                 body=form.body.data,
                                 limit_date=limit_date)
             try:

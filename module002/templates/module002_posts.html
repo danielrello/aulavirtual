@@ -11,25 +11,20 @@
                 Posted by <a href="url_for('.user', username=post.author.username)">{{ post.author.username }}</a>
                 </small>
             </h5>
-            <p class="card-text">
-                {% if post.body_html %}
-                    {{ post.body_html | safe }}
-                {% else %}
-                    {{ post.body }}
-                {% endif %}
-            </p>
+        {% if post.body_html %}
+            <p class="card-text" style="white-space:pre-wrap">{{- post.body_html | safe -}}</p>
+        {% else %}
+            <p class="card-text" style="white-space:pre-wrap">{{- post.body -}}</p>
+        {% endif %}
             {% if current_user == post.author %}
-            <a href="url_for('.edit', id=post.id)">
+            <a href="{{ url_for('module002.module002_edit_post', id=post.id) }}">
                 <span class="label label-primary">Edit</span>
             </a>
-            {% elif current_user.profile == 'teacher' %}
-            <a href="url_for('.edit', id=post.id)">
+            {% elif current_user.profile == 'teacher'%}
+            <a href="{{ url_for('module002.module002_edit_post', id=post.id) }}">
                 <span class="label label-danger">Edit [Admin]</span>
             </a>
             {% endif %}
-            <a href="url_for('.post', id=post.id)">
-                <span class="label label-default">Permalink</span>
-            </a>
             <a href="{{ url_for('module002.module002_post_comments', id=post.id) }}">
                 <span class="label label-primary">{{ post.comments.count() }} Comments</span>
             </a>

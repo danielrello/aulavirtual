@@ -1,7 +1,9 @@
-from flask import Blueprint, render_template, abort, flash, redirect, url_for, request, current_app
+from flask import Blueprint, render_template, abort, flash, redirect, url_for, request, current_app, session
 from flask_login import login_required, current_user
 import timeago, datetime
-from models import Post, db, User, Forum, Course, Comment
+from sqlalchemy.sql import label
+
+from models import Post, db, User, Forum, Course, Comment, Follow
 
 from module002.forms import *
 
@@ -116,6 +118,7 @@ def module002_new_comment():
             flash("Post id:" + id + " " + form.body.data)
     return redirect(url_for('module002.module002_post_comments', id=id))
 
+
 @module002.route('/new_post', methods=['GET', 'POST'])
 @login_required
 def module002_new_post():
@@ -137,16 +140,53 @@ def module002_new_post():
                 db.session.add(none_forum)
                 db.session.commit()
                 forum_id = none_forum.id
-            if form.forum_id.data != "":
+            else:
                 forum_id = form.forum_id.data
-            post = Post(body=form.body.data,
-                        author_id=current_user.id,
-                        title=form.title.data,
-                        forum_id=forum_id)
-            db.session.add(post)
-            db.session.commit()
-            return redirect(url_for('module002.module002_index'))
+            post = Post.query.get(request.args.get('id'))
+            if post:
+                post.title = form.title.data
+                post.body = form.body.data
+                post.forum_id = form.forum_id.data
+                try:
+                    db.session.commit()
+                    flash("Post modified correctly")
+                except:
+                    flash("Could not modify your post")
+            else:
+                post = Post(body=form.body.data,
+                            author_id=current_user.id,
+                            title=form.title.data,
+                            forum_id=forum_id)
+                try:
+                    db.session.add(post)
+                    db.session.commit()
+                    flash("Post added correctly")
+                except:
+                    flash("Could not add your post")
+            return redirect(url_for('module002.module002_forum_posts', id=forum_id))
     return render_template('module002_new_post.html', module="module002", form=form)
+
+
+@module002.route('/edit_post', methods=['GET', 'POST'])
+@login_required
+def module002_edit_post():
+    form = PostForm()
+    if request.method == 'GET' and request.args.get('id'):
+        post_id = request.args.get('id')
+        post = Post.query.get(post_id)
+        form.forum_id.choices += [(post.forum_id, Forum.query.get(post.forum_id).title)]
+        form.forum_id.choices += [("", "---")]
+
+        forums = Forum.query.filter_by(author_id=current_user.id)
+        follows = Follow.query.filter_by(user_id=current_user.id)
+        for follow in follows:
+            forums += Forum.query.get(follow.id)
+        form.body.data = post.body
+        form.title.data = post.title
+        for forum in forums:
+            if forum.id != post.forum_id:
+                form.forum_id.choices += [(forum.id, forum.title)]
+    return render_template('module002_new_post.html', module="module002", form=form, post=post)
 
 
 @module002.route('/test')

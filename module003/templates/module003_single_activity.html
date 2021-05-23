@@ -8,28 +8,32 @@
             <h2>{{ activity.title }}</h2><small>{{ activity.timeago }}</small>
             <h2>Limit time: {{ activity.time_left }}</h2>
         </div>
-        <div class="lead activity-author">
+        <div class="lead activity-author"style="white-space: pre-wrap">
         {% if activity.body_html %}
             {{ activity.body_html | safe }}
         {% else %}
             {{ activity.body }}
         {% endif %}
+        {% if activity.activity_uploads != 'Empty' %}
+            <p>Download included File:<a href="{{ url_for('module003.download',filename=activity.activity_uploads) }}">{{ activity.activity_uploads }}</a></p>
+        {% endif %}
         </div>
     <hr class="my-4">
     </div>
     {% if current_user.profile in ('admin', 'staff', 'professor') %}
+        {% if activity.results %}
         {% for result in activity.results %}
             <div class="result">
-                <div class="result-header">
-                    {{ result.author.username }}
+                <div class="result-header bg-dark text-white p-3 rounded">
+                    Activity from: {{ result.author.username }}
                 </div>
-                <div>
-                    {{ result.body }}
+                <div class="mt-2">
+                    <p style="white-space: pre-wrap">{{ result.body }}</p>
                     Download Files: <a href="{{ url_for('module003.download',filename=result.files) }}">{{ result.files }}</a>
                 </div>
                 <div>
                 <form class="activity-grade form-group"
-                      action="{{url_for('module003.module003_new_result', id=result.id)}}" method="POST">
+                      action="{{url_for('module003.module003_new_result', result_id=result.id)}}" method="POST">
                     {% if result.activity_grade %}
                     Grade:{{ result.activity_grade }} <button onclick="$('#activity-grade').show()"
                             id="edit_grade" type="button" class="btn btn-primary">Edit</button>
@@ -43,9 +47,15 @@
             {% endif %}
             </div>
         {% endfor %}
+            {% else %}
+            <p>No activities have been submitted yet</p>
+            {% endif %}
+    {% elif activity.result %}
+        You already have sent a result. Grade:
+        {{ activity.result.activity_grade }}
     {% else %}
     <form class="activity-content form-group" enctype="multipart/form-data"
-          action="{{url_for('module003.module003_new_result', id=activity.id)}}" method="POST">
+          action="{{url_for('module003.module003_new_result', activity_id=activity.id)}}" method="POST">
         {{ form.hidden_tag() }}
         {{ form.body(class_="form-control", type="textarea") }}
         {{ form.files }}

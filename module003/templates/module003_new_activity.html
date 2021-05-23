@@ -2,18 +2,22 @@
 {% import "bootstrap/wtf.html" as wtf %}
 
 {% block content %}
-<form class="container mt-5 mb-5" method="POST" action="{{url_for('module003.module003_new_activity')}}">
+<form class="container mt-5 mb-5" enctype="multipart/form-data"
+      method="POST" action="{{url_for('module003.module003_new_activity')}}">
     {{ form.hidden_tag() }}
     {{ wtf.form_field(form.title) }}
     {{ wtf.form_field(form.course_id) }}
     {{ wtf.form_field(form.body) }}
     <div class="input-group">
-        <div class='input-group-prepend date' id='datetimepicker3'>
-            {{ form.limit_date(class='datepicker') }}
+        <div class='form-row input-group'>
+            <div class="form-row input-group">
+            {{ wtf.form_field(form.date_expire) }}
+            {{ wtf.form_field(form.time_expire) }}
+            </div>
         </div>
-        {{ form.limit_hour(class_="form-control") }}
-        {{ form.limit_min(class_="form-control") }}
-        {{ form.limit_sec(class_="form-control") }}
+        <div class="form-row input-group">
+            <p class="col align-items-baseline">Upload a file{{ form.files(class_="form-control") }}</p>
+        </div>
     </div>
     <button class="btn btn-lg btn-primary btn-block" type="submit"> Submit </button>
 </form>

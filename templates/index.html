@@ -1,8 +1,45 @@
 {% extends 'base.html' %}
 
 
-{% block content %} 
-	<h1> U-TAD WEB </h1>
-	<p> Manoel Gadi </p>
-	<p> 24/02/2021 </p>
+{% block content %}
+    {% if current_user.is_authenticated %}
+    <div class="d-flex flex-column">
+        <h1> Activities </h1>
+    {% if next or recent %}
+        <h5>Last Day activities</h5>
+        <div class="list-group">
+            {% for activity in recent %}
+                            <div class="list-group-item list-group-item-action list-group-item-secondary"
+                             onclick='window.location.href="{{ url_for('module003.module003_single_activity', activity_id=activity.id) }}"'>
+                                <h3>{{ activity.title }}</h3>{% if activity.result %}<p>Activity Submitted</p><p>Grade: {{ activity.result.activity_grade }}</p>{% endif %}
+                                {% if activity.late %}
+                                <p class="text-danger">Activity ended {{ activity.limit_time }}</p>
+                                {% else %}
+                                <p>Will end {{ activity.limit_time }}</p>
+                                {% endif %}
+                            </div>
+            {% endfor %}
+        </div>
+        <h5>Next activities</h5>
+        {% if next %}
+        <div class="list-group">
+            {% for activity in next %}
+                            <div class="list-group-item list-group-item-action list-group-item-secondary"
+                             onclick='window.location.href="{{ url_for('module003.module003_single_activity', id=activity.id) }}"'>
+                                <h3>{{ activity.title }}</h3>
+                                <small>{{ activity.course.title }}</small>
+                                <p>Limit time: {{ activity.limit_time }}</p>
+                            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <p>You have no activities yet</p>
+        {% endif %}
+    {% else %}
+    <p>You have no activities yet.</p>
+    {% endif %}
+    </div>
+    {% else %}
+        <p>Please Log in to start using AulaVirtual</p>
+    {% endif %}
 {% endblock %} 
