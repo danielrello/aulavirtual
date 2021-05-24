@@ -27,7 +27,7 @@
             {% if current_user.is_authenticated %}
                   <li class="nav-item"><a class="nav-link {% if module=='home' %}{{ "active" }}{% else %}{% endif %}" href="/">Home</a></li>
 
-                  {% if current_user.profile in ('admin','staff','student') %}
+                  {% if current_user.profile in ('admin','staff','student', 'professor') %}
                       <li class="nav-item"><a class="nav-link {% if module=='module001' %}{{ "active" }}{%else%}{%endif%}" href="/course">Course</a></li>
                       <li class="nav-item"><a class="nav-link {% if module=='module002' %}{{ "active" }}{%else%}{%endif%}" href="/board">Discussion Board</a></li>
                       <li class="nav-item"><a class="nav-link {% if module=='module003' %}{{ "active" }}{%else%}{%endif%}" href="/assignment">Assignment</a></li>
