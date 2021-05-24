@@ -33,7 +33,7 @@
                 </div>
                 <div>
                 <form class="activity-grade form-group"
-                      action="{{url_for('module003.module003_new_result', result_id=result.id)}}" method="POST">
+                      action="{{url_for('module003.module003_new_result', activity_id=activity.id, result_id=result.id)}}" method="POST">
                     {% if result.activity_grade %}
                     Grade:{{ result.activity_grade }} <button onclick="$('#activity-grade').show()"
                             id="edit_grade" type="button" class="btn btn-primary">Edit</button>

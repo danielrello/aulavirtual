@@ -2,8 +2,6 @@
 {% import "bootstrap/wtf.html" as wtf %}
 
 {% block subcontent %}
-
-
     <div class="container">
         {% if unfollow %}
            <form class="form-signin" method="POST" action="{{url_for('module001.module001_unfollow')}}">
