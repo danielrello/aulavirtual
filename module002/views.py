@@ -138,8 +138,8 @@ def module002_new_post():
     if request.args.get('forum_id'):
         forum_id = request.args.get('forum_id')
         forum_preselected = Forum.query.filter(Forum.id == forum_id).first()
-        form.forum_id.choices += [(str(forum_preselected.id), forum_preselected.title)]
-        form.forum_id.default = [(str(forum_preselected.id), forum_preselected.title)]
+        form.forum_id.choices += [(forum_preselected.id, forum_preselected.title)]
+        form.forum_id.default = [(forum_preselected.id, forum_preselected.title)]
     for forum in Forum.query.all():
         if forum != forum_preselected:
             form.forum_id.choices += [(forum.id, forum.title)]
