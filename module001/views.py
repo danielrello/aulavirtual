@@ -19,7 +19,7 @@ def super_user(function):
         if not current_user.profile in ('professor', 'staff', 'admin'):
             flash("You do not have permission to view that page", "warning")
             abort(404)
-        return f(*args, **kwargs)
+        return function(*args, **kwargs)
     return decorated_function
 
 @module001.route('/')
