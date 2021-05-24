@@ -51,7 +51,11 @@ def module003_index():
 def module003_single_activity():
     form = ActivityResultForm()
     activity_id = request.args.get('activity_id')
-    activity = Activity.query.get(activity_id)
+    if activity_id:
+        activity = Activity.query.get(activity_id)
+    else:
+        flash("Error fetching activity {}".format(activity_id))
+        return redirect(url_for('module003_index'))
     page = request.args.get('page', 1, type=int)
     has_result = ActivityResult.query.filter(and_(
         ActivityResult.activity_id == activity.id, ActivityResult.user_id == current_user.id)).first()
@@ -82,6 +86,14 @@ def download(filename):
 def module003_new_result():
     form = ActivityResultForm()
     activity_id = request.args.get('activity_id')
+    form.activity_grade.choices+=[(" ", "None")]
+    for i in range(0,10):
+        form.activity_grade.choices+=[(str(i),str(i))]
+    if activity_id:
+        activity = Activity.query.get(activity_id)
+    else:
+        flash("Error fetching activity {}".format(activity_id))
+        return redirect(url_for('module003_index'))
     if request.method == 'POST':
         if current_user.profile in 'student':
             user = ActivityResult.query.filter(and_(ActivityResult.user_id == current_user.id,
@@ -109,7 +121,7 @@ def module003_new_result():
                 flash("Your activity response have been submited")
                 return redirect(url_for('module003.module003_index'))
             else:
-                flash("Couldn't upload the activity result")
+                flash("Form error: {}".format(form.errors))
         else:
             result_id = request.args.get('result_id')
             activity_result = ActivityResult.query.get(result_id)

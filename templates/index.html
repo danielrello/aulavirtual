@@ -25,7 +25,7 @@
         <div class="list-group">
             {% for activity in next %}
                             <div class="list-group-item list-group-item-action list-group-item-secondary"
-                             onclick='window.location.href="{{ url_for('module003.module003_single_activity', id=activity.id) }}"'>
+                             onclick='window.location.href="{{ url_for('module003.module003_single_activity', activity_id=activity.id) }}"'>
                                 <h3>{{ activity.title }}</h3>
                                 <small>{{ activity.course.title }}</small>
                                 <p>Limit time: {{ activity.limit_time }}</p>
