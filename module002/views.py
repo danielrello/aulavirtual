@@ -142,7 +142,7 @@ def module002_new_post():
         form.forum_id.default = [(str(forum_preselected.id), forum_preselected.title)]
     for forum in Forum.query.all():
         if forum != forum_preselected:
-            form.forum_id.choices += [(str(forum.id), forum.title)]
+            form.forum_id.choices += [(forum.id, forum.title)]
     if request.method == 'POST':
         if current_user.is_authenticated and form.validate_on_submit():
             forum_id = form.forum_id.data
