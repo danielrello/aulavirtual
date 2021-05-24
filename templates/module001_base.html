@@ -6,8 +6,10 @@
       <ul class="list-group">
           <li class="list-group-item list-group-item-secondary list-group-item-action">
               <a href={{url_for('module001.module001_index')}}>Home</a></li>
+              {% if current_user.profile in ('professor', 'admin', 'staff') %}
           <li class="list-group-item list-group-item-secondary list-group-item-action">
               <a href={{url_for('module001.module001_course')}}>Create</a></li>
+              {% endif %}
           <li class="list-group-item list-group-item-secondary list-group-item-action">
               <a href={{url_for('module001.module001_follow')}}>Following</a></li>
           <li class="list-group-item list-group-item-secondary list-group-item-action">
