@@ -12,6 +12,8 @@
               {% endif %}
           <li class="list-group-item list-group-item-secondary list-group-item-action">
               <a href={{url_for('module001.module001_follow')}}>Following</a></li>
+          <li class="list-group-item list-group-item-secondary list-group-item-action">
+              <a href={{url_for('module001.module001_unfollow')}}>Unfollowing</a></li>
               {% if current_user.profile in ('professor', 'admin', 'staff') %}
           <li class="list-group-item list-group-item-secondary list-group-item-action">
               <a href={{url_for('module001.module001_participation_generate')}}>Participation</a></li>

@@ -51,8 +51,6 @@ def module003_index():
 def module003_single_activity():
     form = ActivityResultForm()
     activity_id = request.args.get('activity_id')
-    result_id = request.args.get('result_id')
-    result = ActivityResult.query.get(result_id)
     activity = Activity.query.get(activity_id)
     page = request.args.get('page', 1, type=int)
     has_result = ActivityResult.query.filter(and_(

@@ -9,13 +9,13 @@ from models import Forum
 
 class PostForm(FlaskForm):
     title = StringField("Post Title:", validators=[DataRequired()])
-    forum_id = SelectField("Forum:", choices=[])
+    forum_id = SelectField("Forum:", choices=[], coerce=int)
     body = StringField("What's on your mind?", validators=[DataRequired()], widget=TextArea())
 
 
 class ForumForm(FlaskForm):
     title = StringField("Forum Title:", validators=[DataRequired()])
-    course_id = SelectField("Courses:", choices=[])
+    course_id = SelectField("Courses:", choices=[], coerce=int)
 
 
 class CommentForm(FlaskForm):

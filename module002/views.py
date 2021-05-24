@@ -1,6 +1,7 @@
 from flask import Blueprint, render_template, abort, flash, redirect, url_for, request, current_app, session
 from flask_login import login_required, current_user
 import timeago, datetime
+from sqlalchemy import and_
 from sqlalchemy.sql import label
 
 from models import Post, db, User, Forum, Course, Comment, Follow
@@ -16,10 +17,17 @@ def module002_index():
     # user = User.filter_by(id=current_user.id)
     if current_user.profile in ('admin', 'professor', 'student'):
         page = request.args.get('page', 1, type=int)
-        query = Forum.query
-        pagination = query.order_by(Forum.timestamp.desc()).paginate(
-            page, per_page=current_app.config['FLASKY_POSTS_PER_PAGE'],
-            error_out=False)
+        if current_user.profile == 'student':
+            user_forums = db.session.query(Forum).\
+                filter(and_(User.id==Follow.user_id, Follow.course_id==Forum.course_id,
+                            User.id==current_user.id))
+        else:
+            user_forums = db.session.query(Forum).\
+                filter(and_(User.id==Course.user_id,
+                            User.id==current_user.id))
+        pagination = user_forums.order_by(Forum.timestamp.desc()).paginate(
+        page, per_page=current_app.config['FLASKY_POSTS_PER_PAGE'],
+        error_out=False)
         forums = pagination.items
         for forum in forums:
             forum.timeago = timeago.format(forum.timestamp, datetime.datetime.utcnow())
@@ -96,6 +104,8 @@ def module002_new_forum():
             db.session.commit()
             flash("Successfully created a new forum")
             return redirect(url_for('module002.module002_index'))
+        else:
+            flash("Couldn't create new forum. Form error: {}".format(form))
 
     return render_template('module002_new_forum.html', module="module002", form=form)
 

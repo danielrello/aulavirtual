@@ -4,7 +4,8 @@ from wtforms import PasswordField
 from flask_admin.contrib.sqla import ModelView
 from werkzeug.security import generate_password_hash
 from flask_admin.menu import MenuLink
-from models import User, Course, Follow, ParticipationCode, ParticipationRedeem, get_db, Post, Activity, ActivityResult
+from models import User, Course, Follow, ParticipationCode, ParticipationRedeem, get_db, Post, Activity, ActivityResult, \
+    Forum
 
 db = get_db()
 
@@ -48,6 +49,7 @@ def init_admin(app):
         admin.init_app(app)
         admin.add_view(UserAdmin(User,db.session))
         admin.add_view(ProtectedView(Post,db.session))
+        admin.add_view(ProtectedView(Forum,db.session))
         admin.add_view(ProtectedView(Course,db.session))
         admin.add_view(ProtectedView(Follow,db.session))
         admin.add_view(ProtectedView(Activity,db.session))

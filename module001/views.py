@@ -167,7 +167,8 @@ def module001_unfollow():
     if request.method == 'POST':
         if form.validate_on_submit():
             course_code = form.code.data
-            follow = Follow.query.filter(and_(Follow.course_code == form.code.data,
+            course = Course.query.filter(Course.code==course_code).first()
+            follow = Follow.query.filter(and_(Follow.course_id == course.id,
                                               Follow.user_id == current_user.id)).first()
             if follow:
                 try:
@@ -178,7 +179,9 @@ def module001_unfollow():
                 except:
                     db.session.rollback()
                     flash("Error unfollowing!")
-        flash('Something unusual happened, please try again later')
+        else:
+            flash('Error validating form: {}'.format(form.errors))
+        flash('Error something unusual happened')
     else:
         form = FollowForm(code=request.args.get('code'))
     unfollow = True

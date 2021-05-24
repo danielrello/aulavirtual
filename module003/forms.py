@@ -9,7 +9,7 @@ import datetime
 
 class ActivityForm(FlaskForm):
     title = StringField("Activity Title:", validators=[DataRequired()])
-    course_id = SelectField("Course:", choices=[])
+    course_id = SelectField("Course:", choices=[], coerce=int)
     body = StringField("", validators=[DataRequired()], widget=TextArea())
     files = FileField("")
     date_expire = DateField('Choose an expiring date', format='%Y-%m-%d', default=datetime.datetime.today)

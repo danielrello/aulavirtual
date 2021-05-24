@@ -39,13 +39,14 @@ class User(UserMixin, db.Model):  # User extends db.Model
     password = db.Column(db.String(80))
     profile = db.Column(db.String(10), default='student')  # 'admin', 'staff', 'professor', 'student'
     confirmed = db.Column(db.Boolean(), default=False)
-    avatar_hash = db.Column(db.String, default='00000000000000000000000000000000')
+    avatar_hash = db.Column(db.String(50), default='00000000000000000000000000000000')
     userhash = db.Column(db.String(50))
     date_created = db.Column(db.DateTime, default=datetime.datetime.utcnow)
     date_modified = db.Column(db.DateTime, default=datetime.datetime.utcnow,
                               onupdate=datetime.datetime.utcnow)
     course = db.relationship('Course', backref='user', lazy=True)
     comments = db.relationship('Comment', backref='author', lazy='dynamic')
+    follows = db.relationship('Follow', backref='user', lazy='dynamic')
     activities_result = db.relationship('ActivityResult', backref='user', lazy=True)
 
 
