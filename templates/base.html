@@ -39,8 +39,9 @@
                   <li class="nav-item"><a class="nav-link {% if module=='login' %}{{ "active" }}{%else%}{%endif%}" href={{url_for('login')}}>Login</a></li>
                   <li class="nav-item"><a class="nav-link {% if module=='signup' %}{{ "active" }}{%else%}{%endif%}" href={{url_for('signup')}}>Register</a></li>
             {% endif %}
-
+            {% if current_user.is_authenticated %}
                 <li class="nav-item nav-"> <a class="nav-link" href={{url_for('logout')}}>Logout</a></li>
+            {% endif %}
             </ul>
         </div>
       </div>
