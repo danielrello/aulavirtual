@@ -14,7 +14,7 @@ module002 = Blueprint("module002", __name__, static_folder="static", template_fo
 @login_required
 def module002_index():
     # user = User.filter_by(id=current_user.id)
-    if current_user.profile in ('admin', 'staff', 'student'):
+    if current_user.profile in ('admin', 'professor', 'student'):
         page = request.args.get('page', 1, type=int)
         query = Forum.query
         pagination = query.order_by(Forum.timestamp.desc()).paginate(
