@@ -25,7 +25,7 @@ def super_user(function):
 @module001.route('/')
 @login_required
 def module001_index():
-    if current_user.profile in ('admin', 'staff', 'student'):
+    if current_user.profile in ('admin', 'professor', 'student'):
         return render_template("module001_index.html", module="module001")
     else:
         flash("Access denied!")
