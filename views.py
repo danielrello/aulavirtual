@@ -38,7 +38,7 @@ def login():
             elif user.confirmed:
                 login_user(user, remember=form.remember.data)
                 flash("Welcome back {}".format(current_user.username))
-                return redirect(url_for('home'))
+                return redirect(url_for('index'))
             else:
                 flash("User not confirmed. Please visit your email to confirm your user.")
 
