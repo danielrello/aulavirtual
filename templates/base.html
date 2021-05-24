@@ -16,11 +16,13 @@
 {% block body %}
   {% block navbar %}
     <nav class="navbar navbar-expand-sm navbar-light bg-light">
-      <div class="container-fluid">
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
         <div class="navbar-header">
           <a class="navbar-brand" href="/">U-TAD</a>
         </div>
-          <div class="collapse navbar-collapse" id="navbarText">
+          <div class="collapse navbar-collapse" id="navbarSupportedContent"">
             <ul class="nav navbar-nav justify-content-around me-auto mb-2 mb-lg-0">
             {% if current_user.is_authenticated %}
                   <li class="nav-item"><a class="nav-link {% if module=='home' %}{{ "active" }}{% else %}{% endif %}" href="/">Home</a></li>
@@ -43,7 +45,6 @@
                 <li class="nav-item nav-"> <a class="nav-link" href={{url_for('logout')}}>Logout</a></li>
             {% endif %}
             </ul>
-        </div>
       </div>
     </nav>
     {% endblock %}
