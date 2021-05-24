@@ -1,5 +1,6 @@
 from flask import Blueprint, render_template, abort, flash, redirect, url_for, request
 from flask_login import login_required, current_user
+from functools import wraps
 from sqlalchemy import or_, and_
 from models import get_db, User, Course, Follow, ParticipationCode, ParticipationRedeem
 import random
@@ -10,6 +11,16 @@ from module001.forms import *
 module001 = Blueprint("module001", __name__, static_folder="static", template_folder="templates")
 db = get_db()
 
+
+# Defining our custom decorator
+def super_user(function):
+    @wraps(function)
+    def decorated_function(*args, **kwargs):
+        if not current_user.profile in ('professor', 'staff', 'admin'):
+            flash("You do not have permission to view that page", "warning")
+            abort(404)
+        return f(*args, **kwargs)
+    return decorated_function
 
 @module001.route('/')
 @login_required
@@ -23,6 +34,7 @@ def module001_index():
 
 @module001.route('/course', methods=['GET', 'POST'])
 @login_required
+@super_user
 def module001_course():
     form = CourseForm()
     if request.method == 'POST':
@@ -178,6 +190,7 @@ def module001_unfollow():
 
 @module001.route('/participation_generate', methods=['GET', 'POST'])
 @login_required
+@super_user
 def module001_participation_generate():
     form = ParticipationCodeForm()
     if request.method == 'POST':
