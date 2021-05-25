@@ -2,7 +2,7 @@ from flask import Blueprint, render_template, abort, flash, redirect, url_for, r
 from flask_login import login_required, current_user
 from functools import wraps
 from sqlalchemy import or_, and_
-from models import get_db, Course, Follow, ParticipationCode, ParticipationRedeem
+from models import get_db, Course, ParticipationCode, ParticipationRedeem, User
 import random
 
 from module001.forms import *
@@ -19,7 +19,9 @@ def super_user(function):
             flash("You do not have permission to view that page", "warning")
             abort(404)
         return function(*args, **kwargs)
+
     return decorated_function
+
 
 @module001.route('/')
 @login_required
@@ -131,32 +133,29 @@ def module001_sharing_details():
 def module001_follow():
     form = FollowForm()
     unfollow = False
+    follows = User.query.get(current_user.id).courses
     if request.method == 'POST':
         if form.validate_on_submit():
             course_code = form.code.data
-            course_id = Course.query.filter(Course.code==form.code.data).first()
-            follow = Follow.query.filter(and_(Follow.course_id == course_id.id,
-                                              Follow.user_id == current_user.id)).first()
-            if follow:
-                flash("You are already following the course {} ".format(course_code))
-            else:
-                course = Course.query.filter_by(code=form.code.data).first()
-                if not course:
-                    flash('The code {} is invalid, try again with the correct code.'.format(form.code.data))
-                else:
-                    follow = Follow(user_id=current_user.id,
-                                    course_id=course.id)
+            course = Course.query.filter(Course.code == form.code.data).first()
+            if course:
+                is_following = False
+                for follow in follows:
+                    if follow.course_id == course.id:
+                        is_following = True
+                        flash("You are already following the course {} ".format(course_code))
+                if is_following == False:
+                    follows.append(course)
                     try:
-                        db.session.add(follow)
                         db.session.commit()
                         flash("You are now following {}".format(course.name))
                     except:
                         db.session.rollback()
                         flash("Error following!")
+            else:
+                flash('The code {} is invalid, try again with the correct code.'.format(form.code.data))
     elif ('sharedlink' in request.args):
         form = FollowForm(code=request.args.get('code'))
-
-    follows = Follow.query.filter_by(user_id=current_user.id)
     return render_template('module001_follow.html', module="module001", form=form, rows=follows, unfollow=unfollow)
 
 
@@ -164,15 +163,14 @@ def module001_follow():
 @login_required
 def module001_unfollow():
     form = FollowForm()
+    follows = User.query.get(current_user.id).courses
     if request.method == 'POST':
         if form.validate_on_submit():
             course_code = form.code.data
-            course = Course.query.filter(Course.code==course_code).first()
-            follow = Follow.query.filter(and_(Follow.course_id == course.id,
-                                              Follow.user_id == current_user.id)).first()
-            if follow:
+            course = Course.query.filter(Course.code == course_code).first()
+            if follows:
+                follows.remove(course)
                 try:
-                    db.session.delete(follow)
                     db.session.commit()
                     flash("You are not following {} any longer".format(course_code))
                     return redirect(url_for('module001.module001_follow'))
@@ -185,7 +183,6 @@ def module001_unfollow():
     else:
         form = FollowForm(code=request.args.get('code'))
     unfollow = True
-    follows = Follow.query.filter_by(user_id=current_user.id)
 
     return render_template('module001_follow.html', module="module001", form=form, rows=follows, unfollow=unfollow)
 

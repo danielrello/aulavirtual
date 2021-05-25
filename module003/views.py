@@ -8,7 +8,7 @@ from sqlalchemy import and_
 from werkzeug.utils import secure_filename
 
 from flask_app_running import app
-from models import User, Course, Activity, Follow, db, ActivityResult
+from models import User, Course, Activity, db, ActivityResult
 from module003.forms import ActivityForm, ActivityResultForm
 
 module003 = Blueprint("module003", __name__, static_folder="static", template_folder="templates")
@@ -21,11 +21,7 @@ def module003_index():
     courses_author_pagination = query.filter_by(user_id=current_user.id).paginate(
         page, per_page=current_app.config['FLASKY_POSTS_PER_PAGE'],
         error_out=False)
-    follow_courses = Follow.query
-    pagination = follow_courses.filter_by(user_id=current_user.id).paginate(
-        page, per_page=current_app.config['FLASKY_POSTS_PER_PAGE'],
-        error_out=False)
-    follows = pagination.items
+    follows = User.query.get(current_user.id).courses
     courses_author = courses_author_pagination.items
     courses = []
     for course in courses_author:
@@ -36,13 +32,11 @@ def module003_index():
             activity.limit_datestr = activity.limit_date.strftime("%Y-%m-%d %H:%M:%S")
         courses.append(course)
     for follow in follows:
-        course = Course.query.get(follow.course_id)
-        if course.id is not None:
-            author = User.query.get(course.user_id)
-            course.author = author
-        for activity in course.activities:
+        author = User.query.get(follow.user_id)
+        follow.author = author
+        for activity in follow.activities:
             activity.limit_datestr = activity.limit_date.strftime("%Y-%m-%d %H:%M:%S")
-        courses.append(course)
+        courses.append(follow)
     return render_template("module003_index.html", module='module003', courses=courses)
 
 

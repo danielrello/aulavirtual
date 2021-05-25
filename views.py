@@ -7,7 +7,7 @@ from application import get_app
 from flask_login import login_required, login_user, logout_user, current_user
 from flask import render_template, request, redirect, url_for, flash, current_app
 from sqlalchemy import or_, and_
-from models import User, get_db, Activity, Course, Follow, ActivityResult
+from models import User, get_db, Activity, Course, ActivityResult
 from werkzeug.security import generate_password_hash, check_password_hash
 from mail import send_email
 
@@ -155,27 +155,19 @@ def index():
         page = request.args.get('page', 1, type=int)
         recent = []
         next = []
-        user_activities = db.session.query(Activity).\
-            filter(and_(User.id==Follow.user_id, Follow.course_id==Course.id,
-                        Course.id==Activity.course_id, User.id==current_user.id))
-        paginate = user_activities.order_by(Activity.limit_date.desc()).paginate(
-            page, per_page=current_app.config['FLASKY_POSTS_PER_PAGE'],
-            error_out=False)
-        activities = paginate.items
-        for activity in activities:
-            course = Course.query.get(activity.course_id)
-            activity.course = course
-            activity.limit_time = timeago.format(activity.limit_date, datetime.datetime.utcnow())
-            result = ActivityResult.query.filter(and_(ActivityResult.activity_id == activity.id,
-                                                      ActivityResult.user_id == current_user.id)).first()
-            if result:
-                activity.result = result
-            if activity.limit_date.date() == datetime.datetime.today().date():
-                if activity.limit_date < datetime.datetime.utcnow():
-                    activity.late = True
-                recent.append(activity)
-            else:
-                next.append(activity)
+        follows = User.query.get(current_user.id).courses
+
+        for follow in follows:
+            for activity in follow.activities:
+                activity.limit_time = timeago.format(activity.limit_date, datetime.datetime.utcnow())
+                result = ActivityResult.query.filter(and_(ActivityResult.activity_id==activity.id,
+                                                             ActivityResult.user_id==current_user.id)).first()
+                if result:
+                    activity.result = result
+                if activity.limit_date.date() == datetime.datetime.utcnow().date():
+                    recent.append(activity)
+                else:
+                    next.append(activity)
 
     return render_template('index.html', module="home", recent=recent, next=next)
 
