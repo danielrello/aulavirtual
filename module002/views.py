@@ -23,7 +23,7 @@ def module002_index():
                             User.id==current_user.id))
         else:
             user_forums = db.session.query(Forum).\
-                filter(and_(User.id==Course.user_id,
+                filter(and_(User.id==Forum.author_id,
                             User.id==current_user.id))
         pagination = user_forums.order_by(Forum.timestamp.desc()).paginate(
         page, per_page=current_app.config['FLASKY_POSTS_PER_PAGE'],
