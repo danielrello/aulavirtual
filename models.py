@@ -30,6 +30,9 @@ from application import get_app
 app = get_app()
 db = init_db(app)
 
+courses = db.Table('courses',
+                   db.Column('user_id', db.Integer, db.ForeignKey('users.id'), primary_key=True),
+                   db.Column('course_id', db.Integer, db.ForeignKey('course.id'), primary_key=True))
 
 class User(UserMixin, db.Model):  # User extends db.Model
     __tablename__ = 'users'
@@ -46,7 +49,8 @@ class User(UserMixin, db.Model):  # User extends db.Model
                               onupdate=datetime.datetime.utcnow)
     course = db.relationship('Course', backref='user', lazy=True)
     comments = db.relationship('Comment', backref='author', lazy='dynamic')
-    follows = db.relationship('Follow', backref='user', lazy='dynamic')
+    courses = db.relationship('Course', secondary=courses, lazy='subquery',
+                              backref=db.backref('pages', lazy=True))
     activities_result = db.relationship('ActivityResult', backref='user', lazy=True)
 
 
@@ -126,16 +130,7 @@ class Course(UserMixin, db.Model):  # User extends db.Model
     date_created = db.Column(db.DateTime, default=datetime.datetime.utcnow)
     date_modified = db.Column(db.DateTime, default=datetime.datetime.utcnow,
                               onupdate=datetime.datetime.utcnow)
-    follows = db.relationship('Follow', backref='course', lazy=True)
     activities = db.relationship('Activity', backref='course', lazy=True)
-
-
-class Follow(UserMixin, db.Model):  # User extends db.Model
-    id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
-    course_id = db.Column(db.Integer, db.ForeignKey('course.id'), nullable=False)
-    date_created = db.Column(db.DateTime, default=datetime.datetime.utcnow)
-
 
 
 class ParticipationCode(UserMixin, db.Model):  # User extends db.Model

@@ -2,9 +2,8 @@ from flask import Blueprint, render_template, abort, flash, redirect, url_for, r
 from flask_login import login_required, current_user
 import timeago, datetime
 from sqlalchemy import and_
-from sqlalchemy.sql import label
 
-from models import Post, db, User, Forum, Course, Comment, Follow
+from models import Post, db, User, Forum, Course, Comment
 
 from module002.forms import *
 
@@ -17,10 +16,11 @@ def module002_index():
     # user = User.filter_by(id=current_user.id)
     if current_user.profile in ('admin', 'professor', 'student'):
         page = request.args.get('page', 1, type=int)
+        follows = User.query.get(current_user.id).courses
         if current_user.profile == 'student':
-            user_forums = db.session.query(Forum).\
-                filter(and_(User.id==Follow.user_id, Follow.course_id==Forum.course_id,
-                            User.id==current_user.id))
+            for follow in follows:
+                user_forums = db.session.query(Forum).\
+                    filter(Forum.course_id==follow.id)
         else:
             user_forums = db.session.query(Forum).\
                 filter(and_(User.id==Course.user_id,
@@ -171,7 +171,7 @@ def module002_edit_post():
     form.forum_id.choices += [(post.forum_id, Forum.query.get(post.forum_id).title)]
 
     forums = Forum.query.filter_by(author_id=current_user.id)
-    follows = Follow.query.filter_by(user_id=current_user.id)
+    follows = User.query.get(current_user.id).courses
     for follow in follows:
         forums += Forum.query.get(follow.id)
     form.body.data = post.body

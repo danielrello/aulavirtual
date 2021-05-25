@@ -9,15 +9,15 @@
         <h5>Last Day activities</h5>
         <div class="list-group">
             {% for activity in recent %}
-                            <div class="list-group-item list-group-item-action list-group-item-secondary"
-                             onclick='window.location.href="{{ url_for('module003.module003_single_activity', activity_id=activity.id) }}"'>
-                                <h3>{{ activity.title }}</h3>{% if activity.result %}<p>Activity Submitted</p><p>Grade: {{ activity.result.activity_grade }}</p>{% endif %}
-                                {% if activity.late %}
-                                <p class="text-danger">Activity ended {{ activity.limit_time }}</p>
-                                {% else %}
-                                <p>Will end {{ activity.limit_time }}</p>
-                                {% endif %}
-                            </div>
+            <div class="list-group-item list-group-item-action list-group-item-secondary"
+             onclick='window.location.href="{{ url_for('module003.module003_single_activity', activity_id=activity.id) }}"'>
+                <h3>{{ activity.title }}</h3>{% if activity.result %}<p>Activity Submitted</p><p>Grade: {{ activity.result.activity_grade }}</p>{% endif %}
+                {% if activity.late %}
+                <p class="text-danger">Activity ended {{ activity.limit_time }}</p>
+                {% else %}
+                <p>Will end {{ activity.limit_time }}</p>
+                {% endif %}
+            </div>
             {% endfor %}
         </div>
         <h5>Next activities</h5>
