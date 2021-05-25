@@ -48,6 +48,7 @@ class User(UserMixin, db.Model):  # User extends db.Model
     comments = db.relationship('Comment', backref='author', lazy='dynamic')
     follows = db.relationship('Follow', backref='user', lazy='dynamic')
     activities_result = db.relationship('ActivityResult', backref='user', lazy=True)
+    forums = db.relationship('Forum', backref='user', lazy=True)
 
 
 class Forum(db.Model):
