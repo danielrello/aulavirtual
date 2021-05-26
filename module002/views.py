@@ -16,11 +16,8 @@ def module002_index():
     # user = User.filter_by(id=current_user.id)
     if current_user.profile in ('admin', 'professor', 'student'):
         page = request.args.get('page', 1, type=int)
-        follows = User.query.get(current_user.id).courses
         if current_user.profile == 'student':
-            for follow in follows:
-                user_forums = db.session.query(Forum).\
-                    filter(Forum.course_id==follow.id)
+            user_forums = db.session.query(Forum).join(Course, User.courses).filter(Forum.course_id == Course.id)
         else:
             user_forums = db.session.query(Forum).\
                 filter(and_(User.id==Course.user_id,
@@ -115,8 +112,14 @@ def module002_new_forum():
 def module002_new_comment():
     form = CommentForm()
     id = request.args.get('id')
+    errors = None
     if request.method == 'POST':
-        if current_user.is_authenticated and form.validate_on_submit():
+        post = Post.query.get(id)
+        follows = db.session.query(Forum).join(Course, User.courses)\
+            .filter(and_(Forum.course_id == post.forum_id)).first()
+        if follows is None:
+            errors = 'You are not following the course'
+        if current_user.is_authenticated and form.validate_on_submit() and follows is not None:
             comment = Comment(author_id=current_user.id,
                               post_id=id,
                               body=form.body.data)
@@ -124,8 +127,11 @@ def module002_new_comment():
             db.session.commit()
             flash("Successfully created a new comment")
         else:
-            flash("An error has occurred while sending your comment")
-            flash("Post id:" + id + " " + form.body.data)
+            if errors:
+                flash(errors)
+            else:
+                flash("An error has occurred while sending your comment")
+                flash("Post id:" + id + " " + form.body.data)
     return redirect(url_for('module002.module002_post_comments', id=id))
 
 
@@ -144,7 +150,10 @@ def module002_new_post():
         if forum != forum_preselected:
             form.forum_id.choices += [(forum.id, forum.title)]
     if request.method == 'POST':
-        if current_user.is_authenticated and form.validate_on_submit():
+        follows = db.session.query(Forum).join(Course, User.courses)\
+            .filter(and_(Forum.course_id == form.forum_id.data)).first()
+        errors = 'You are not following the course'
+        if current_user.is_authenticated and form.validate_on_submit() and follows is not None:
             forum_id = form.forum_id.data
             post = Post(body=form.body.data,
                         author_id=current_user.id,
@@ -158,7 +167,7 @@ def module002_new_post():
             except:
                 flash("Could not add your post")
         else:
-            flash("Could not verify your post {}".format(form.errors))
+            flash("Could not verify your post {} {}".format(form.errors,errors))
     return render_template('module002_new_post.html', module="module002", form=form)
 
 
@@ -170,18 +179,19 @@ def module002_edit_post():
     post = Post.query.get(post_id)
     form.forum_id.choices += [(post.forum_id, Forum.query.get(post.forum_id).title)]
 
-    forums = Forum.query.filter_by(author_id=current_user.id)
-    follows = User.query.get(current_user.id).courses
+    forums = []
+    own_forums = Forum.query.filter_by(author_id=current_user.id)
+    follows = db.session.query(Forum).join(Course, User.courses).filter(and_(Forum.course_id==Course.id,
+                                                                             User.id==current_user.id,
+                                                                             Forum.author_id==current_user.id))
     for follow in follows:
-        forums += Forum.query.get(follow.id)
-    form.body.data = post.body
-    form.title.data = post.title
+        forums.append(Forum.query.get(follow.id))
     for forum in forums:
         if forum.id != post.forum_id:
             form.forum_id.choices += [(forum.id, forum.title)]
     if request.method == 'POST':
         if current_user.is_authenticated and form.validate_on_submit():
-            post = Post.query.get(request.args.get('id'))
+            post = db.session.query(Post).get(request.args.get('id'))
             if post:
                 post.title = form.title.data
                 post.body = form.body.data
@@ -194,6 +204,9 @@ def module002_edit_post():
                     flash("Could not modify your post")
             else:
                 flash("No post was selected")
+    else:
+        form.body.data = post.body
+        form.title.data = post.title
     return render_template('module002_new_post.html', module="module002", form=form, post=post)
 
 

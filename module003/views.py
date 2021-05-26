@@ -81,6 +81,7 @@ def module003_new_result():
     form = ActivityResultForm()
     activity_id = request.args.get('activity_id')
     form.activity_grade.choices+=[(" ", "None")]
+    errors = None
     for i in range(0,10):
         form.activity_grade.choices+=[(str(i),str(i))]
     if activity_id:
@@ -92,6 +93,10 @@ def module003_new_result():
         if current_user.profile in 'student':
             user = ActivityResult.query.filter(and_(ActivityResult.user_id == current_user.id,
                                                     ActivityResult.activity_id == activity_id)).first()
+            follows = db.session.query(User).join(Course, User.courses)\
+                .filter(and_(Course.id==activity.course_id, User.id==current_user.id)).first()
+            if follows is None:
+                errors = 'You must be following the course to send your activity'
             if user:
                 flash("You have already sent your result")
                 return module003_single_activity()
@@ -102,7 +107,7 @@ def module003_new_result():
             else:
                 filename='Empty'
             form.activity_grade.data = 'None'
-            if current_user.is_authenticated and form.validate_on_submit():
+            if current_user.is_authenticated and form.validate_on_submit() and follows is not None:
                 result = ActivityResult(user_id=current_user.id,
                                         activity_id=activity_id,
                                         files=filename,
@@ -115,7 +120,7 @@ def module003_new_result():
                 flash("Your activity response have been submited")
                 return redirect(url_for('module003.module003_index'))
             else:
-                flash("Form error: {}".format(form.errors))
+                flash("Form error: {} {}".format(form.errors, errors))
         else:
             result_id = request.args.get('result_id')
             activity_result = ActivityResult.query.get(result_id)
