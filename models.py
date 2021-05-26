@@ -72,6 +72,7 @@ class Post(db.Model):
     body = db.Column(db.Text)
     body_html = db.Column(db.Text)
     timestamp = db.Column(db.DateTime, default=datetime.datetime.utcnow)
+    #shown = db.Column(db.Boolean, default=True)
     author_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     forum_id = db.Column(db.Integer, db.ForeignKey('forums.id'))
     comments = db.relationship('Comment', backref='post', lazy='dynamic')
