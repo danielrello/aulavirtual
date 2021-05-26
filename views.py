@@ -164,6 +164,8 @@ def index():
                                                              ActivityResult.user_id==current_user.id)).first()
                 if result:
                     activity.result = result
+                if activity.limit_date.date() < datetime.datetime.utcnow().date():
+                    activity.late = True
                 if activity.limit_date.date() == datetime.datetime.utcnow().date():
                     recent.append(activity)
                 else:
